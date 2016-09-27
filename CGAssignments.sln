@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A2MagicCube", "A2MagicCube\A2MagicCube.vcxproj", "{0ADB4C0C-B558-4F50-B7AE-7949D14F8456}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "headers", "headers", "{45893EF1-0E32-4073-A13A-F3CF6FF506EE}"
+	ProjectSection(SolutionItems) = preProject
+		include\camera.h = include\camera.h
+		include\filesystem.h = include\filesystem.h
+		include\mesh.h = include\mesh.h
+		include\model.h = include\model.h
+		include\shader.h = include\shader.h
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0ADB4C0C-B558-4F50-B7AE-7949D14F8456}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0ADB4C0C-B558-4F50-B7AE-7949D14F8456}.Debug|Win32.Build.0 = Debug|Win32
+		{0ADB4C0C-B558-4F50-B7AE-7949D14F8456}.Release|Win32.ActiveCfg = Release|Win32
+		{0ADB4C0C-B558-4F50-B7AE-7949D14F8456}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
