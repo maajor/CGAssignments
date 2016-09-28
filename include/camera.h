@@ -2,6 +2,7 @@
 
 // Std. Includes
 #include <vector>
+#include <iostream>
 
 // GL Includes
 #include <GL/glew.h>
@@ -32,6 +33,7 @@ class Camera
 public:
     // Camera Attributes
     glm::vec3 Position;
+	glm::vec3 Target;
     glm::vec3 Front;
     glm::vec3 Up;
     glm::vec3 Right;
@@ -51,7 +53,8 @@ public:
         this->WorldUp = up;
         this->Yaw = yaw;
         this->Pitch = pitch;
-        this->updateCameraVectors();
+		this->updateYPCameraVectors();
+		std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
     }
     // Constructor with scalar values
     Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
@@ -60,9 +63,20 @@ public:
         this->WorldUp = glm::vec3(upX, upY, upZ);
         this->Yaw = yaw;
         this->Pitch = pitch;
-        this->updateCameraVectors();
+		this->updateYPCameraVectors();
     }
-
+	
+	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up): MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
+	{
+		this->Position = position;
+		this->Target = target;
+		this->WorldUp = up;
+		this->Yaw = -90.0f;
+		this->Pitch = 0.0f;
+		this->Front = glm::normalize( - position + target);
+		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
+	}
     // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
@@ -102,8 +116,34 @@ public:
         }
 
         // Update Front, Right and Up Vectors using the updated Eular angles
-        this->updateCameraVectors();
+		this->updateYPCameraVectors();
     }
+
+	void ProcessMouseRotate(GLfloat xoffset, GLfloat yoffset){
+
+		float distance = glm::distance(this->Position, this->Target);
+		//xoffset *= this->MouseSensitivity;
+		//yoffset *= this->MouseSensitivity;
+		xoffset *= 0.001;
+		yoffset *= 0.001;
+		
+		glm::mat4 trans;
+		trans = glm::rotate(trans, xoffset, this->WorldUp);
+		trans = glm::rotate(trans, yoffset, this->Right);
+		this->Front = glm::mat3(trans) * this->Front;
+		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  
+		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
+
+		this->Position = this->Target - this->Front * distance;
+		std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
+	}
+	void ProcessMousePan(GLfloat xoffset, GLfloat yoffset){
+		xoffset *= 0.001;
+		yoffset *= 0.001;
+
+		this->Position += yoffset * this->Up + xoffset * this->Right;
+		this->Target += yoffset * this->Up + xoffset * this->Right;
+	}
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(GLfloat yoffset)
@@ -118,7 +158,7 @@ public:
 
 private:
     // Calculates the front vector from the Camera's (updated) Eular Angles
-    void updateCameraVectors()
+    void updateYPCameraVectors()
     {
         // Calculate the new Front vector
         glm::vec3 front;

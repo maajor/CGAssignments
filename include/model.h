@@ -11,14 +11,15 @@ using namespace std;
 #include <GL/glew.h> // Contains all the necessery OpenGL includes
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SOIL.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "mesh.h"
+#include "shader.h"
 
-GLint TextureFromFile(const char* path, string directory, bool gamma = false);
 
 class Model 
 {
@@ -28,17 +29,20 @@ public:
     vector<Mesh> meshes;
     string directory;
     bool gammaCorrection;
+	glm::mat4 modelTransform;
 
     /*  Functions   */
     // Constructor, expects a filepath to a 3D model.
     Model(string const & path, bool gamma = false) : gammaCorrection(gamma)
     {
         this->loadModel(path);
+		modelTransform = glm::mat4();
     }
 
     // Draws the model, and thus all its meshes
     void Draw(Shader shader)
     {
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelTransform));
         for(GLuint i = 0; i < this->meshes.size(); i++)
             this->meshes[i].Draw(shader);
     }
@@ -199,7 +203,7 @@ private:
             if(!skip)
             {   // If texture hasn't been loaded already, load it
                 Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
+                texture.id = TextureFromFile(str.C_Str(), this->directory, false);
                 texture.type = typeName;
                 texture.path = str;
                 textures.push_back(texture);
@@ -208,31 +212,31 @@ private:
         }
         return textures;
     }
+
+	GLint TextureFromFile(const char* path, string directory, bool gamma)
+	{
+		//Generate texture ID and load texture data 
+		string filename = string(path);
+		filename = directory + '/' + filename;
+		GLuint textureID;
+		glGenTextures(1, &textureID);
+		int width, height;
+		unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+		// Assign texture to ID
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		// Parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		SOIL_free_image_data(image);
+		return textureID;
+	}
 };
 
 
 
-
-GLint TextureFromFile(const char* path, string directory, bool gamma)
-{
-     //Generate texture ID and load texture data 
-    string filename = string(path);
-    filename = directory + '/' + filename;
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    int width,height;
-    unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-    // Assign texture to ID
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);	
-
-    // Parameters
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    SOIL_free_image_data(image);
-    return textureID;
-}

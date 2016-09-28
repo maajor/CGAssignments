@@ -1,10 +1,11 @@
 #pragma once
 #include "../include/model.h"
+#include "../include/shader.h"
 
 class MagicCube
 {
 public:
-	MagicCube();
+	MagicCube(unsigned _rank, string unitPath);
 	~MagicCube();
 
 	enum Axis { X_Axis, Y_Axis, Z_Axis };
@@ -15,8 +16,9 @@ public:
 	void rotateY(unsigned row, float angleInDegree);
 	void rotateZ(unsigned row, float angleInDegree);
 	void resetCube(unsigned axis, unsigned row, int direction);
+	void render(Shader shader);
 
 private:
-	
+	std::vector<std::vector<std::vector<Model>>> _CubeModels;
 };
 
