@@ -1,0 +1,20 @@
+﻿Build started 2013/10/13 9:52:14.
+     1>Project "E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\physics.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+       ManifestResourceCompile:
+         All outputs are up-to-date.
+       Link:
+         All outputs are up-to-date.
+       Manifest:
+         All outputs are up-to-date.
+       FinalizeBuildStatus:
+         Deleting file "Debug\physics.unsuccessfulbuild".
+         Touching "Debug\physics.lastbuildstate".
+     1>Done Building Project "E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.06

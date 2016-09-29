@@ -175,21 +175,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	prevPosY = cursorPosY;
 	cursorPosX = xpos;
 	cursorPosY = ypos;
-	/*
-	if (firstMouse) // this bool variable is initially set to true
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	GLfloat offsetX = xpos - lastX;
-	GLfloat offsetY = lastY - ypos;
-	lastX = xpos;
-	lastY = ypos;
-
-	camera.ProcessMouseMovement(offsetX, offsetY);
-	*/
 }
 
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){

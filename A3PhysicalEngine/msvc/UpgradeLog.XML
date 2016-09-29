@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="physics">
+</Property><Property Name="Solution File" Value="E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.sln">
+</Property><Property Name="Date" Value="2013年10月13日">
+</Property><Property Name="Time" Value="9:47">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="physics.sln" Description="File successfully backed up as E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.sln.old">
+</Event><Event ErrorLevel="0" Project="physics" Source="physics.vcproj" Description="Converting project file 'E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.vcproj'.">
+</Event><Event ErrorLevel="1" Project="physics" Source="physics.vcproj" Description="VCWebServiceProxyGeneratorTool is no longer supported. The tool has been removed from your project settings.">
+</Event><Event ErrorLevel="0" Project="physics" Source="physics.vcproj" Description="Done converting to new project file 'E:\2013下半年\English graphicss\图形学课程\Projects-Part3\PhysicalEngine\p5out\msvc\physics.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="physics" Source="physics.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="physics.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="physics.sln" Description="Converted">
+</Event></UpgradeLog>
