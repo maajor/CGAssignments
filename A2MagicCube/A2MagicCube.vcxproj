@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClCompile Include="MagicCube.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\fragmentShader.glsl" />

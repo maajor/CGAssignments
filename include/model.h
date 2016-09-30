@@ -30,6 +30,7 @@ public:
     string directory;
     bool gammaCorrection;
 	glm::mat4 modelTransform;
+	glm::vec3 bbx[2];
 
     /*  Functions   */
     // Constructor, expects a filepath to a 3D model.
@@ -38,6 +39,9 @@ public:
         this->loadModel(path);
 		modelTransform = glm::mat4();
     }
+	Model(){
+	
+	}
 
     // Draws the model, and thus all its meshes
     void Draw(Shader shader)

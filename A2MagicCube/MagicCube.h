@@ -1,10 +1,12 @@
 #pragma once
 #include "../include/model.h"
 #include "../include/shader.h"
+#include "ray.h"
 
 class MagicCube
 {
 public:
+	MagicCube();
 	MagicCube(unsigned _rank, string unitPath);
 	~MagicCube();
 
@@ -17,6 +19,8 @@ public:
 	void rotateZ(unsigned row, float angleInDegree);
 	void resetCube(unsigned axis, unsigned row, int direction);
 	void render(Shader shader);
+	bool findHit(Ray hitray, glm::vec3 &hitIndex);
+
 
 private:
 	std::vector<std::vector<std::vector<Model>>> _CubeModels;

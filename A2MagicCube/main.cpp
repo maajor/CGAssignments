@@ -28,6 +28,7 @@
 #include <SOIL.h>
 
 #include "MagicCube.h"
+#include "ray.h"
 
 // Properties
 GLuint screenWidth = 800, screenHeight = 600;
@@ -54,6 +55,7 @@ bool inModelRotate = false;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+MagicCube myCube;
 // The MAIN function, from here we start our application and run our Game loop
 int main()
 {
@@ -86,10 +88,8 @@ int main()
 	// Setup and compile our shaders
 	Shader shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
 
-	// Load models
 	Model ourModel("maya/cube.obj");
-
-	MagicCube myCube = MagicCube(6, "maya/cube.obj");
+	myCube = MagicCube(6, "maya/cube.obj");
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -111,7 +111,7 @@ int main()
 		shader.SetDefaultLight();
 		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 
-		myCube.rotateX(1, deltaTime);
+		//myCube.rotateX(1, deltaTime);
 		// Draw the loaded model
 		myCube.render(shader);
 
@@ -192,6 +192,13 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 		}
 		else{
 			inViewPan = true;
+		}
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT){
+		glm::vec3 hitIndex;
+		Ray hitray(camera, glm::vec2(cursorPosX, cursorPosY), glm::vec2(screenWidth, screenHeight));
+		if (myCube.findHit(hitray, hitIndex)){
+			std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << std::endl;
 		}
 	}
 }
