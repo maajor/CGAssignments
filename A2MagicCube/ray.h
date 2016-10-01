@@ -8,7 +8,7 @@ public:
 	Ray(Camera camera, glm::vec2 hitPos, glm::vec2 screenSize);
 	~Ray();
 
-	bool checkHit(float &hitT, glm::vec3 bbx[2]);
+	bool checkHit(float &hitT, glm::vec3 bbx[2], int &side);
 private:
 	glm::vec3 origin;
 	glm::vec3 direction;

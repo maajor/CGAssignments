@@ -37,8 +37,10 @@ Ray::~Ray(){
 	return;
 }
 
-bool Ray::checkHit(float &hitT, glm::vec3 bbx[2]){
+//side:0 x, 1 y, 2 z;
+bool Ray::checkHit(float &hitT, glm::vec3 bbx[2], int &side){
 	float tmin, tmax, tymin, tymax, tzmin, tzmax;
+	int hitside = 0;
 
 	tmin = (bbx[sign[0]].x - origin.x) * invdir.x;
 	tmax = (bbx[1 - sign[0]].x - origin.x) * invdir.x;
@@ -48,7 +50,10 @@ bool Ray::checkHit(float &hitT, glm::vec3 bbx[2]){
 	if ((tmin > tymax) || (tymin > tmax))
 		return false;
 	if (tymin > tmin)
+	{
 		tmin = tymin;
+		hitside = 1;
+	}
 	if (tymax < tmax)
 		tmax = tymax;
 
@@ -58,10 +63,14 @@ bool Ray::checkHit(float &hitT, glm::vec3 bbx[2]){
 	if ((tmin > tzmax) || (tzmin > tmax))
 		return false;
 	if (tzmin > tmin)
+	{
+		hitside = 2;
 		tmin = tzmin;
+	}
 	if (tzmax < tmax)
 		tmax = tzmax;
 
 	hitT = tmin;
+	side = hitside;
 	return true;
 }

@@ -19,7 +19,7 @@ public:
 	void rotateZ(unsigned row, float angleInDegree);
 	void resetCube(unsigned axis, unsigned row, int direction);
 	void render(Shader shader);
-	bool findHit(Ray hitray, glm::vec3 &hitIndex);
+	bool findHit(Ray hitray, glm::vec3 &hitIndex, int &side);
 
 
 private:

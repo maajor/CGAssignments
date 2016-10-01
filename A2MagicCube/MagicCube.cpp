@@ -9,8 +9,8 @@ MagicCube::MagicCube(unsigned _rank, string unitPath)
 		for (int j = 0; j < _rank; j++){
 			for (int k = 0; k < _rank; k++){
 				_CubeModels[i][j][k] = Model(unitPath);
-				_CubeModels[i][j][k].bbx[0] = glm::vec3(-0.5f, -0.5f, -0.5f);
-				_CubeModels[i][j][k].bbx[1] = glm::vec3(0.5f, 0.5f, 0.5f);
+				_CubeModels[i][j][k].bbx[0] = glm::vec3(-0.5f, 0, -0.5f);
+				_CubeModels[i][j][k].bbx[1] = glm::vec3(0.5f, 1.0f, 0.5f);
 				float xpos = (i - this->rank / 2.0f) + 0.5f;
 				float ypos = (j - this->rank / 2.0f) + 0.5f;
 				float zpos = (k - this->rank / 2.0f) + 0.5f;
@@ -73,7 +73,7 @@ void MagicCube::render(Shader shader){
 	}
 }
 
-bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex){
+bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 	glm::vec3 hitIndexTemp(-1, -1, -1);
 	float minHitDist = FLT_MAX;
 	for (int i = 0; i < this->rank; i++){
@@ -83,7 +83,7 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex){
 				glm::vec3 currentBbx[2];
 				currentBbx[0] = glm::vec3(_CubeModels[i][j][k].modelTransform * glm::vec4(_CubeModels[i][j][k].bbx[0], 1));
 				currentBbx[1] = glm::vec3(_CubeModels[i][j][k].modelTransform * glm::vec4(_CubeModels[i][j][k].bbx[1], 1));
-				if (hitray.checkHit(hitDist, currentBbx))
+				if (hitray.checkHit(hitDist, currentBbx, side))
 				{
 					if (hitDist < minHitDist)
 					{

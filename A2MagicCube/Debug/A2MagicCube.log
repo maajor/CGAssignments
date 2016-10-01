@@ -1,55 +1,33 @@
-﻿生成启动时间为 2016-09-30 22:17:56。
+﻿生成启动时间为 2016-10-01 22:36:25。
      1>项目“D:\GraduateYear2\ComputerGraphic\CGAssignments\A2MagicCube\A2MagicCube.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt MagicCube.cpp
-         MagicCube.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
      1>d:\graduateyear2\computergraphic\cgassignments\include\camera.h(127): warning C4305: “*=”: 从“double”到“GLfloat”截断
      1>d:\graduateyear2\computergraphic\cgassignments\include\camera.h(128): warning C4305: “*=”: 从“double”到“GLfloat”截断
      1>d:\graduateyear2\computergraphic\cgassignments\include\camera.h(141): warning C4305: “*=”: 从“double”到“GLfloat”截断
      1>d:\graduateyear2\computergraphic\cgassignments\include\camera.h(142): warning C4305: “*=”: 从“double”到“GLfloat”截断
      1>d:\graduateyear2\computergraphic\cgassignments\include\shader.h(66): warning C4101: “success”: 未引用的局部变量
      1>d:\graduateyear2\computergraphic\cgassignments\include\shader.h(67): warning C4101: “infoLog”: 未引用的局部变量
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(8): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(9): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(10): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(34): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(35): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(45): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(46): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(56): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(57): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(67): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(68): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(69): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(79): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(80): warning C4018: “<”: 有符号/无符号不匹配
-     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\magiccube.cpp(81): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(100): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(159): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(162): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(165): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(168): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(171): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(174): warning C4244: “参数”: 从“float”转换到“unsigned int”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(196): warning C4244: “=”: 从“double”转换到“GLfloat”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(197): warning C4244: “=”: 从“double”转换到“GLfloat”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(202): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(203): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\graduateyear2\computergraphic\cgassignments\a2magiccube\main.cpp(237): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\A2MagicCube.exe" /INCREMENTAL /NOLOGO "assimp-vc120-mt.lib" opengl32.lib glfw3.lib glew32s.lib SOIL.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\A2MagicCube.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\A2MagicCube.lib" /MACHINE:X86 Debug\MagicCube.obj
          Debug\main.obj
          Debug\ray.obj
-     1>LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
-     1>LINK : warning LNK4098: 默认库“LIBCMT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewActiveTexture
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewBindBuffer
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewBufferData
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewGenBuffers
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewEnableVertexAttribArray
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewGetUniformLocation
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewUniform1i
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewUniformMatrix4fv
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewVertexAttribPointer
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewGenerateMipmap
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewBindVertexArray
-     1>MagicCube.obj : warning LNK4049: 已导入本地定义的符号 ___glewGenVertexArrays
-     1>glew32s.lib(glew.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“glew32s.lib(glew.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
-     1>SOIL.lib(image_DXT.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“SOIL.lib(image_DXT.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
-     1>SOIL.lib(image_helper.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“SOIL.lib(image_helper.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
-     1>SOIL.lib(SOIL.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“SOIL.lib(SOIL.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
-     1>SOIL.lib(stb_image_aug.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“SOIL.lib(stb_image_aug.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
          A2MagicCube.vcxproj -> D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\A2MagicCube.exe
      1>已完成生成项目“D:\GraduateYear2\ComputerGraphic\CGAssignments\A2MagicCube\A2MagicCube.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.82
+已用时间 00:00:01.29

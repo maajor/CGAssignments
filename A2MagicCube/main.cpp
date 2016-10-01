@@ -55,6 +55,9 @@ bool inModelRotate = false;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+glm::vec3 hitIndex;
+int hitSide;
+
 MagicCube myCube;
 // The MAIN function, from here we start our application and run our Game loop
 int main()
@@ -89,7 +92,7 @@ int main()
 	Shader shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
 
 	Model ourModel("maya/cube.obj");
-	myCube = MagicCube(6, "maya/cube.obj");
+	myCube = MagicCube(3, "maya/cube.obj");
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -148,6 +151,29 @@ void Do_Movement()
 		float yoffset = cursorPosY - prevPosY;
 		camera.ProcessMousePan(xoffset, yoffset);
 	}
+	if (inModelRotate){
+		float sensit = 0.001f;
+		float xoffset = -cursorPosX + prevPosX;
+		float yoffset = cursorPosY - prevPosY;
+		if ((xoffset > yoffset) && (hitSide = 0)){
+			myCube.rotateY(hitIndex.y, xoffset * sensit);
+		}
+		else if ((xoffset < yoffset) && (hitSide = 0)){
+			myCube.rotateZ(hitIndex.z, yoffset * sensit);
+		}
+		else if ((xoffset > yoffset) && (hitSide = 1)){
+			myCube.rotateX(hitIndex.x, xoffset * sensit);
+		}
+		else if ((xoffset < yoffset) && (hitSide = 1)){
+			myCube.rotateZ(hitIndex.z, yoffset * sensit);
+		}
+		else if ((xoffset > yoffset) && (hitSide = 2)){
+			myCube.rotateY(hitIndex.y, xoffset * sensit);
+		}
+		else if ((xoffset < yoffset) && (hitSide = 2)){
+			myCube.rotateX(hitIndex.x, yoffset * sensit);
+		}
+	}
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -194,12 +220,15 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 			inViewPan = true;
 		}
 	}
-	if (button == GLFW_MOUSE_BUTTON_LEFT){
-		glm::vec3 hitIndex;
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && keys[GLFW_KEY_LEFT_CONTROL] == true){
 		Ray hitray(camera, glm::vec2(cursorPosX, cursorPosY), glm::vec2(screenWidth, screenHeight));
-		if (myCube.findHit(hitray, hitIndex)){
-			std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << std::endl;
+		if (myCube.findHit(hitray, hitIndex, hitSide)){
+			std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << " "<< hitSide <<std::endl;
+			inModelRotate = true;
 		}
+	}
+	else{
+		inModelRotate = false;
 	}
 }
 
