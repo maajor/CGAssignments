@@ -47,10 +47,14 @@ bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
 float cursorPosX, cursorPosY;
 float prevPosX, prevPosY;
+float lastHitX, lastHitY;
 bool firstMouse = true;
 bool inViewRotate = false;
 bool inViewPan = false;
 bool inModelRotate = false;
+int lastModelRotateDirection = 0;
+float lastModelRotationAngle = 0;
+int lastModelRotationRow = 0;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -152,26 +156,59 @@ void Do_Movement()
 		camera.ProcessMousePan(xoffset, yoffset);
 	}
 	if (inModelRotate){
-		float sensit = 0.001f;
-		float xoffset = -cursorPosX + prevPosX;
-		float yoffset = cursorPosY - prevPosY;
-		if ((xoffset > yoffset) && (hitSide = 0)){
-			myCube.rotateY(hitIndex.y, xoffset * sensit);
+		float sensit = 0.01f;
+		float xoffset = - cursorPosX + lastHitX;
+		float yoffset = - cursorPosY + lastHitY;
+		float xoffsetAbs = std::abs(xoffset);
+		float yoffsetAbs = std::abs(yoffset);
+
+		if ((xoffsetAbs > yoffsetAbs) && (hitSide = 0)){
+			if (lastModelRotateDirection == 2)
+				myCube.resetTransform();
+			myCube.rotateYTo(hitIndex.y, xoffset * sensit);
+			lastModelRotateDirection = 1;
+			lastModelRotationRow = hitIndex.y;
+			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffset < yoffset) && (hitSide = 0)){
-			myCube.rotateZ(hitIndex.z, yoffset * sensit);
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 0)){
+			if (lastModelRotateDirection == 1)
+				myCube.resetTransform();
+			myCube.rotateZTo(hitIndex.z, yoffset * sensit);
+			lastModelRotateDirection = 2;
+			lastModelRotationRow = hitIndex.z;
+			lastModelRotationAngle = yoffset * sensit;
 		}
-		else if ((xoffset > yoffset) && (hitSide = 1)){
-			myCube.rotateX(hitIndex.x, xoffset * sensit);
+		else if ((xoffsetAbs > yoffsetAbs) && (hitSide = 1)){
+			if (lastModelRotateDirection == 2)
+				myCube.resetTransform();
+			myCube.rotateXTo(hitIndex.x, xoffset * sensit);
+			lastModelRotateDirection = 0;
+			lastModelRotationRow = hitIndex.x;
+			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffset < yoffset) && (hitSide = 1)){
-			myCube.rotateZ(hitIndex.z, yoffset * sensit);
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 1)){
+			if (lastModelRotateDirection == 0)
+				myCube.resetTransform();
+			myCube.rotateZTo(hitIndex.z, yoffset * sensit);
+			lastModelRotateDirection = 2;
+			lastModelRotationRow = hitIndex.z;
+			lastModelRotationAngle = yoffset * sensit;
 		}
-		else if ((xoffset > yoffset) && (hitSide = 2)){
-			myCube.rotateY(hitIndex.y, xoffset * sensit);
+		else if ((xoffsetAbs > yoffsetAbs) && (hitSide = 2)){
+			if (lastModelRotateDirection == 0)
+				myCube.resetTransform();
+			myCube.rotateYTo(hitIndex.y, xoffset * sensit);
+			lastModelRotateDirection = 1;
+			lastModelRotationRow = hitIndex.y;
+			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffset < yoffset) && (hitSide = 2)){
-			myCube.rotateX(hitIndex.x, yoffset * sensit);
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 2)){
+			if (lastModelRotateDirection == 1)
+				myCube.resetTransform();
+			myCube.rotateXTo(hitIndex.x, yoffset * sensit);
+			lastModelRotateDirection = 0;
+			lastModelRotationRow = hitIndex.x;
+			lastModelRotationAngle = yoffset * sensit;
 		}
 	}
 }
@@ -224,10 +261,19 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 		Ray hitray(camera, glm::vec2(cursorPosX, cursorPosY), glm::vec2(screenWidth, screenHeight));
 		if (myCube.findHit(hitray, hitIndex, hitSide)){
 			std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << " "<< hitSide <<std::endl;
-			inModelRotate = true;
+			inModelRotate = true; 
+			lastHitX = cursorPosX;
+			lastHitY = cursorPosY;
+			lastModelRotateDirection = (hitSide + 1) % 3;
 		}
 	}
 	else{
+		if (keys[GLFW_KEY_LEFT_CONTROL] == true){
+			myCube.resetCube(lastModelRotateDirection, lastModelRotationRow, lastModelRotationAngle);
+			std::cout << "finish Rotate" << std::endl;
+		}
+		else
+			myCube.resetTransform();
 		inModelRotate = false;
 	}
 }

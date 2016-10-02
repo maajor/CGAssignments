@@ -14,10 +14,14 @@ public:
 	enum Rotate_Direction { Clockwise, CounterClockwise };
 
 	unsigned rank;//2-6
-	void rotateX(unsigned row, float angleInDegree);
-	void rotateY(unsigned row, float angleInDegree);
-	void rotateZ(unsigned row, float angleInDegree);
-	void resetCube(unsigned axis, unsigned row, int direction);
+	void rotateXIncrement(unsigned row, float angleInDegree);
+	void rotateYIncrement(unsigned row, float angleInDegree);
+	void rotateZIncrement(unsigned row, float angleInDegree);
+	void rotateXTo(unsigned row, float angleInDegree);
+	void rotateYTo(unsigned row, float angleInDegree);
+	void rotateZTo(unsigned row, float angleInDegree);
+	void resetTransform();
+	void resetCube(unsigned axis, unsigned row, float angle);
 	void render(Shader shader);
 	bool findHit(Ray hitray, glm::vec3 &hitIndex, int &side);
 

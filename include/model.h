@@ -30,6 +30,8 @@ public:
     string directory;
     bool gammaCorrection;
 	glm::mat4 modelTransform;
+	glm::mat4 modelTranslate;
+	glm::mat4 modelRotation;
 	glm::vec3 bbx[2];
 
     /*  Functions   */
@@ -38,6 +40,8 @@ public:
     {
         this->loadModel(path);
 		modelTransform = glm::mat4();
+		modelTranslate = glm::mat4();
+		modelRotation = glm::mat4();
     }
 	Model(){
 	
