@@ -26,7 +26,10 @@ public:
 	bool findHit(Ray hitray, glm::vec3 &hitIndex, int &side);
 
 
+
 private:
 	std::vector<std::vector<std::vector<Model>>> _CubeModels;
+	std::vector<std::vector<glm::mat4>> _tempRotMatrix;
+	void MagicCube::calIndexRotate(int i, int j, int rank, int& outI, int& outJ, float rot);
 };
 

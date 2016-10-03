@@ -5,6 +5,7 @@ MagicCube::MagicCube(unsigned _rank, string unitPath)
 {
 	this->rank = _rank;
 	this->_CubeModels = std::vector<std::vector<std::vector<Model>>>(_rank, std::vector<std::vector<Model> >(_rank, std::vector<Model>(_rank, Model(unitPath))));
+	this->_tempRotMatrix = std::vector<std::vector<glm::mat4>>(_rank, std::vector<glm::mat4>(_rank, glm::mat4()));
 	for (int i = 0; i < _rank; i++){
 		for (int j = 0; j < _rank; j++){
 			for (int k = 0; k < _rank; k++){
@@ -70,7 +71,7 @@ void MagicCube::rotateXTo(unsigned row, float angleInDegree){
 		for (int k = 0; k < this->rank; k++){
 			glm::mat4 rotate;
 			rotate = glm::rotate(rotate, angleInDegree, glm::vec3(1.0f, 0.0f, 0.0f));
-			_CubeModels[row][j][k].modelTransform = rotate * _CubeModels[row][j][k].modelRotation * _CubeModels[row][j][k].modelTranslate;
+			_CubeModels[row][j][k].modelTransform = rotate * _CubeModels[row][j][k].modelTranslate * _CubeModels[row][j][k].modelRotation;
 		}
 	}
 }
@@ -81,7 +82,7 @@ void MagicCube::rotateYTo(unsigned row, float angleInDegree){
 		for (int k = 0; k < this->rank; k++){
 			glm::mat4 rotate;
 			rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 1.0f, 0.0f));
-			_CubeModels[j][row][k].modelTransform = rotate * _CubeModels[j][row][k].modelRotation* _CubeModels[j][row][k].modelTranslate;
+			_CubeModels[j][row][k].modelTransform = rotate * _CubeModels[j][row][k].modelTranslate * _CubeModels[j][row][k].modelRotation;
 		}
 	}
 }
@@ -92,7 +93,8 @@ void MagicCube::rotateZTo(unsigned row, float angleInDegree){
 		for (int k = 0; k < this->rank; k++){
 			glm::mat4 rotate;
 			rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 0.0f, 1.0f));
-			_CubeModels[j][k][row].modelTransform = rotate * _CubeModels[j][k][row].modelRotation* _CubeModels[j][k][row].modelTranslate;
+			_CubeModels[j][k][row].modelTransform = rotate *  _CubeModels[j][k][row].modelTranslate * _CubeModels[j][k][row].modelRotation;
+			//_CubeModels[j][k][row].modelTransform = _CubeModels[j][k][row].modelTranslate * rotate * _CubeModels[j][k][row].modelRotation;
 		}
 	}
 }
@@ -113,29 +115,74 @@ void MagicCube::resetCube(unsigned axis, unsigned row, float angle){
 		rotate = glm::rotate(rotate, angleInDegree, glm::vec3(1.0f, 0.0f, 0.0f));
 		for (int i = 0; i < this->rank; i++){
 			for (int j = 0; j < this->rank; j++){
-				_CubeModels[row][i][j].modelRotation = _CubeModels[row][i][j].modelRotation * rotate;
-				_CubeModels[row][i][j].modelTransform = _CubeModels[row][i][j].modelTranslate * _CubeModels[row][i][j].modelRotation;
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[row][i][j].modelTransform = _CubeModels[row][i][j].modelTranslate * rotate * _CubeModels[row][in][jn].modelRotation;
+				_tempRotMatrix[i][j] = _CubeModels[row][i][j].modelRotation;
 
 			}
 		}
+		for (int i = 0; i < this->rank; i++){
+			for (int j = 0; j < this->rank; j++){
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[row][i][j].modelRotation = rotate * _tempRotMatrix[in][jn];
+			}
+		}
+		/*
+		for (int i = 0; i < this->rank; i++){
+			for (int j = 0; j < this->rank; j++){
+				//_CubeModels[row][i][j].modelRotation = _CubeModels[row][i][j].modelRotation * rotate;
+				_CubeModels[row][i][j].modelTransform = _CubeModels[row][i][j].modelTranslate * rotate * _CubeModels[row][i][j].modelRotation;
+				_CubeModels[row][i][j].modelRotation = rotate * _CubeModels[row][i][j].modelRotation;
+
+			}
+		}*/
 	}
 	else if (axis == 1){
 		rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 1.0f, 0.0f));
 		for (int i = 0; i < this->rank; i++){
 			for (int j = 0; j < this->rank; j++){
-				_CubeModels[i][row][j].modelRotation = _CubeModels[i][row][j].modelRotation * rotate;
-				_CubeModels[i][row][j].modelTransform = _CubeModels[i][row][j].modelTranslate * _CubeModels[i][row][j].modelRotation;
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[i][row][j].modelTransform = _CubeModels[i][row][j].modelTranslate * rotate * _CubeModels[in][row][jn].modelRotation;
+				_tempRotMatrix[i][j] = _CubeModels[i][row][j].modelRotation;
 
 			}
 		}
+		for (int i = 0; i < this->rank; i++){
+			for (int j = 0; j < this->rank; j++){
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[i][row][j].modelRotation = rotate * _tempRotMatrix[in][jn];
+			}
+		}
+		/*
+		for (int i = 0; i < this->rank; i++){
+			for (int j = 0; j < this->rank; j++){
+				//_CubeModels[i][row][j].modelRotation = _CubeModels[i][row][j].modelRotation * rotate;
+				_CubeModels[i][row][j].modelTransform = _CubeModels[i][row][j].modelTranslate * rotate * _CubeModels[i][row][j].modelRotation;
+				_CubeModels[i][row][j].modelRotation = rotate *  _CubeModels[i][row][j].modelRotation;
+
+			}
+		}*/
 	}
 	else {
 		rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 0.0f, 1.0f));
 		for (int i = 0; i < this->rank; i++){
 			for (int j = 0; j < this->rank; j++){
-				_CubeModels[i][j][row].modelRotation = _CubeModels[i][j][row].modelRotation * rotate;
-				_CubeModels[i][j][row].modelTransform = _CubeModels[i][j][row].modelTranslate * _CubeModels[i][j][row].modelRotation;
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[i][j][row].modelTransform = _CubeModels[i][j][row].modelTranslate * rotate * _CubeModels[in][jn][row].modelRotation;
+				_tempRotMatrix[i][j] = _CubeModels[i][j][row].modelRotation;
 
+			}
+		}
+		for (int i = 0; i < this->rank; i++){
+			for (int j = 0; j < this->rank; j++){
+				int in, jn;
+				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				_CubeModels[i][j][row].modelRotation = rotate * _tempRotMatrix[in][jn];
 			}
 		}
 	}
@@ -181,4 +228,13 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 		hitIndex = hitIndexTemp;
 		return true;
 	}
+}
+
+void MagicCube::calIndexRotate(int i, int j, int rank, int& outI, int& outJ, float rotAng){
+	glm::vec2 fromID = glm::vec2(i - (rank - 1) / 2, j - (rank - 1) / 2);
+	glm::mat2 rot = glm::mat2(cos(rotAng), -sin(rotAng), sin(rotAng), cos(rotAng));
+	fromID = rot * fromID;
+	outI = fromID.x + (rank - 1) / 2;
+	outJ = fromID.y + (rank - 1) / 2;
+	return;
 }
