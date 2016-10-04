@@ -129,15 +129,6 @@ void MagicCube::resetCube(unsigned axis, unsigned row, float angle){
 				_CubeModels[row][i][j].modelRotation = rotate * _tempRotMatrix[in][jn];
 			}
 		}
-		/*
-		for (int i = 0; i < this->rank; i++){
-			for (int j = 0; j < this->rank; j++){
-				//_CubeModels[row][i][j].modelRotation = _CubeModels[row][i][j].modelRotation * rotate;
-				_CubeModels[row][i][j].modelTransform = _CubeModels[row][i][j].modelTranslate * rotate * _CubeModels[row][i][j].modelRotation;
-				_CubeModels[row][i][j].modelRotation = rotate * _CubeModels[row][i][j].modelRotation;
-
-			}
-		}*/
 	}
 	else if (axis == 1){
 		rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -157,15 +148,6 @@ void MagicCube::resetCube(unsigned axis, unsigned row, float angle){
 				_CubeModels[i][row][j].modelRotation = rotate * _tempRotMatrix[in][jn];
 			}
 		}
-		/*
-		for (int i = 0; i < this->rank; i++){
-			for (int j = 0; j < this->rank; j++){
-				//_CubeModels[i][row][j].modelRotation = _CubeModels[i][row][j].modelRotation * rotate;
-				_CubeModels[i][row][j].modelTransform = _CubeModels[i][row][j].modelTranslate * rotate * _CubeModels[i][row][j].modelRotation;
-				_CubeModels[i][row][j].modelRotation = rotate *  _CubeModels[i][row][j].modelRotation;
-
-			}
-		}*/
 	}
 	else {
 		rotate = glm::rotate(rotate, angleInDegree, glm::vec3(0.0f, 0.0f, 1.0f));
