@@ -54,7 +54,7 @@ public:
         this->Yaw = yaw;
         this->Pitch = pitch;
 		this->updateYPCameraVectors();
-		std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
+		//std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
     }
     // Constructor with scalar values
     Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
@@ -135,7 +135,7 @@ public:
 		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
 
 		this->Position = this->Target - this->Front * distance;
-		std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
+		//std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
 	}
 	void ProcessMousePan(GLfloat xoffset, GLfloat yoffset){
 		xoffset *= 0.001;

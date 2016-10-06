@@ -14,4 +14,31 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="terrain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="terrain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="terrainVertexShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="terrainFragmentShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="waterVertexShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="waterFragmentShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+  </ItemGroup>
 </Project>

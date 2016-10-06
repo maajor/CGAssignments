@@ -199,6 +199,7 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 						hitIndexTemp = glm::vec3(i, j, k);
 					}
 				}
+				std::cout << "side now is " << side << std::endl;
 			}
 		}
 	}
@@ -213,10 +214,11 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 }
 
 void MagicCube::calIndexRotate(int i, int j, int rank, int& outI, int& outJ, float rotAng){
-	glm::vec2 fromID = glm::vec2(i - (rank - 1) / 2, j - (rank - 1) / 2);
+	glm::vec2 fromID = glm::vec2(i - (float)(rank - 1) / 2, j - (float)(rank - 1) / 2);
 	glm::mat2 rot = glm::mat2(cos(rotAng), -sin(rotAng), sin(rotAng), cos(rotAng));
 	fromID = rot * fromID;
-	outI = fromID.x + (rank - 1) / 2;
-	outJ = fromID.y + (rank - 1) / 2;
+	outI = std::round(fromID.x + (float)(rank - 1) / 2);
+	outJ = std::round(fromID.y + (float)(rank - 1) / 2);
+	//std::cout << "from: " << i << "," << j << " to " << outI << "," << outJ << endl;
 	return;
 }

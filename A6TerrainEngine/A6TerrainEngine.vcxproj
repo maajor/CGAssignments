@@ -78,6 +78,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="terrain.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="terrain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="terrainFragmentShader.glsl" />
+    <None Include="terrainVertexShader.glsl" />
+    <None Include="waterFragmentShader.glsl" />
+    <None Include="waterVertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

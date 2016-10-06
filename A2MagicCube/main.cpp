@@ -14,6 +14,9 @@
 // GLFW
 #include <GLFW/glfw3.h>
 
+#include <gl/glut.h>
+#include <gl/glu.h>
+
 // GL includes
 #include "../include/shader.h"
 #include "../include/camera.h"
@@ -39,6 +42,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mode);
 void Do_Movement();
+void mymenu(int value);
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -91,6 +95,7 @@ int main()
 
 	// Setup some OpenGL options
 	glEnable(GL_DEPTH_TEST);
+
 
 	// Setup and compile our shaders
 	Shader shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
@@ -157,12 +162,12 @@ void Do_Movement()
 	}
 	if (inModelRotate){
 		float sensit = 0.01f;
-		float xoffset = - cursorPosX + lastHitX;
-		float yoffset = - cursorPosY + lastHitY;
+		float xoffset =  cursorPosX - lastHitX;
+		float yoffset =  cursorPosY - lastHitY;
 		float xoffsetAbs = std::abs(xoffset);
 		float yoffsetAbs = std::abs(yoffset);
 
-		if ((xoffsetAbs > yoffsetAbs) && (hitSide = 0)){
+		if ((xoffsetAbs >= yoffsetAbs) && (hitSide == 0)){
 			if (lastModelRotateDirection == 2)
 				myCube.resetTransform();
 			myCube.rotateYTo(hitIndex.y, xoffset * sensit);
@@ -170,7 +175,7 @@ void Do_Movement()
 			lastModelRotationRow = hitIndex.y;
 			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 0)){
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide == 0)){
 			if (lastModelRotateDirection == 1)
 				myCube.resetTransform();
 			myCube.rotateZTo(hitIndex.z, yoffset * sensit);
@@ -178,7 +183,7 @@ void Do_Movement()
 			lastModelRotationRow = hitIndex.z;
 			lastModelRotationAngle = yoffset * sensit;
 		}
-		else if ((xoffsetAbs > yoffsetAbs) && (hitSide = 1)){
+		else if ((xoffsetAbs >= yoffsetAbs) && (hitSide == 1)){
 			if (lastModelRotateDirection == 2)
 				myCube.resetTransform();
 			myCube.rotateXTo(hitIndex.x, xoffset * sensit);
@@ -186,7 +191,7 @@ void Do_Movement()
 			lastModelRotationRow = hitIndex.x;
 			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 1)){
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide == 1)){
 			if (lastModelRotateDirection == 0)
 				myCube.resetTransform();
 			myCube.rotateZTo(hitIndex.z, yoffset * sensit);
@@ -194,7 +199,7 @@ void Do_Movement()
 			lastModelRotationRow = hitIndex.z;
 			lastModelRotationAngle = yoffset * sensit;
 		}
-		else if ((xoffsetAbs > yoffsetAbs) && (hitSide = 2)){
+		else if ((xoffsetAbs >= yoffsetAbs) && (hitSide == 2)){
 			if (lastModelRotateDirection == 0)
 				myCube.resetTransform();
 			myCube.rotateYTo(hitIndex.y, xoffset * sensit);
@@ -202,7 +207,7 @@ void Do_Movement()
 			lastModelRotationRow = hitIndex.y;
 			lastModelRotationAngle = xoffset * sensit;
 		}
-		else if ((xoffsetAbs < yoffsetAbs) && (hitSide = 2)){
+		else if ((xoffsetAbs < yoffsetAbs) && (hitSide == 2)){
 			if (lastModelRotateDirection == 1)
 				myCube.resetTransform();
 			myCube.rotateXTo(hitIndex.x, yoffset * sensit);
@@ -223,6 +228,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		keys[key] = true;
 	else if (action == GLFW_RELEASE)
 		keys[key] = false;
+
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
+		myCube = MagicCube(2, "maya/cube.obj");
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
+		myCube = MagicCube(3, "maya/cube.obj");
+	if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
+		myCube = MagicCube(4, "maya/cube.obj");
+	if (key == GLFW_KEY_F5 && action == GLFW_PRESS)
+		myCube = MagicCube(5, "maya/cube.obj");
+	if (key == GLFW_KEY_F6 && action == GLFW_PRESS)
+		myCube = MagicCube(6, "maya/cube.obj");
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -265,12 +281,14 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 			lastHitX = cursorPosX;
 			lastHitY = cursorPosY;
 			lastModelRotateDirection = (hitSide + 1) % 3;
+			std::cout << "last model dir: " << lastModelRotateDirection << " " << hitSide << std::endl;
+			//lastModelRotateDirection = hitSide;
 		}
 	}
 	else{
 		if (keys[GLFW_KEY_LEFT_CONTROL] == true){
 			myCube.resetCube(lastModelRotateDirection, lastModelRotationRow, lastModelRotationAngle);
-			std::cout << "finish Rotate" << std::endl;
+			std::cout << "finish Rotate" << lastModelRotateDirection << " axis" <<std::endl;
 		}
 		else
 			myCube.resetTransform();
@@ -281,6 +299,24 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
+}
+
+void mymenu(int value){
+
+	if (value == 1){
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glutSwapBuffers();
+
+	}
+
+	if (value == 2){
+
+		exit(0);
+
+	}
+
 }
 
 #pragma endregion
