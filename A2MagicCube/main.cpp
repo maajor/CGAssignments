@@ -77,7 +77,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", nullptr, nullptr); // Windowed
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "AssignmentA2", nullptr, nullptr); // Windowed
 	glfwMakeContextCurrent(window);
 
 	// Set the required callback functions
@@ -122,6 +122,7 @@ int main()
 
 		shader.SetDefaultLight();
 		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+
 
 		//myCube.rotateX(1, deltaTime);
 		// Draw the loaded model

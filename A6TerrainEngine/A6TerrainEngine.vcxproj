@@ -57,6 +57,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc120-mt.lib;opengl32.lib;glfw3.lib;glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,10 +86,10 @@
     <ClCompile Include="terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="terrainFragmentShader.glsl" />
-    <None Include="terrainVertexShader.glsl" />
-    <None Include="waterFragmentShader.glsl" />
-    <None Include="waterVertexShader.glsl" />
+    <None Include="shader\terrainFragmentShader.glsl" />
+    <None Include="shader\terrainVertexShader.glsl" />
+    <None Include="shader\waterFragmentShader.glsl" />
+    <None Include="shader\waterVertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

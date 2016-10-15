@@ -28,16 +28,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="terrainVertexShader.glsl">
+    <None Include="shader\terrainFragmentShader.glsl">
       <Filter>源文件</Filter>
     </None>
-    <None Include="terrainFragmentShader.glsl">
+    <None Include="shader\terrainVertexShader.glsl">
       <Filter>源文件</Filter>
     </None>
-    <None Include="waterVertexShader.glsl">
+    <None Include="shader\waterFragmentShader.glsl">
       <Filter>源文件</Filter>
     </None>
-    <None Include="waterFragmentShader.glsl">
+    <None Include="shader\waterVertexShader.glsl">
       <Filter>源文件</Filter>
     </None>
   </ItemGroup>
