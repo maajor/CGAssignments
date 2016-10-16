@@ -10,11 +10,14 @@
 class Terrain
 {
 public:
-	Terrain();
+	Terrain(Shader shader);
 	~Terrain();
 
-	void loadFromFile(const GLchar* pathname);
-	void render(Shader shader);
+	Shader terrainShader;
+
+	void loadHeightmap(const GLchar* pathname);
+	void loadTexture(const GLchar* diffuse, const GLchar* specular, const GLchar* normal, const GLchar* detail);
+	void render();
 private:
 	int width;
 	int height;
@@ -29,5 +32,7 @@ private:
 
 	GLfloat* vertices;
 	GLuint* indices;
+
+	GLuint texDiffuse, texSpec, texNorm, texDeta;
 };
 

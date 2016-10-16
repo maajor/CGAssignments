@@ -73,9 +73,9 @@ int main(){
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	Terrain myterrain;
-	myterrain = Terrain();
-	myterrain.loadFromFile("heightmap.bmp");
+	Terrain myterrain(shader);
+	myterrain.loadHeightmap("textures/heightmap.bmp");
+	myterrain.loadTexture("textures/terrain-texture3.bmp", NULL, NULL, NULL);
 	
 
 	while (!glfwWindowShouldClose(window))
@@ -91,12 +91,12 @@ int main(){
 		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.Use();  
+		myterrain.terrainShader.Use();  
 
-		shader.SetDefaultLight();
-		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+		myterrain.terrainShader.SetDefaultLight();
+		myterrain.terrainShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
 		
-		myterrain.render(shader);
+		myterrain.render();
 
 		glfwSwapBuffers(window);
 

@@ -16,6 +16,11 @@ class Shader
 {
 public:
     GLuint Program;
+
+	Shader(){
+		this->Program = glCreateProgram();
+	}
+
     // Constructor generates the shader on the fly
     Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath = nullptr)
     {
@@ -135,7 +140,7 @@ public:
 
 	void SetDefaultLight(){
 		glUniform3f(glGetUniformLocation(this->Program, "AmbientColor"), 0.1f, 0.1f, 0.1f);
-		SetDirLight(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+		SetDirLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
 	}
 
 	void SetCameraProperty(int width, int height, float near, float far, Camera camera){
