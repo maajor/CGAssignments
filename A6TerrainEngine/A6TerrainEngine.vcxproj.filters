@@ -18,12 +18,24 @@
     <ClInclude Include="terrain.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sky.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Water.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="terrain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sky.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Water.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,6 +50,12 @@
       <Filter>源文件</Filter>
     </None>
     <None Include="shader\waterVertexShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="shader\skyFragmentShader.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="shader\skyVertexShader.glsl">
       <Filter>源文件</Filter>
     </None>
   </ItemGroup>

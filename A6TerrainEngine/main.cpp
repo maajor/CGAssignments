@@ -18,6 +18,7 @@
 #include <SOIL.h>
 
 #include "terrain.h"
+#include "Sky.h"
 
 GLuint screenWidth = 800, screenHeight = 600;
 
@@ -77,6 +78,8 @@ int main(){
 	myterrain.loadHeightmap("textures/heightmap.bmp");
 	myterrain.loadTexture("textures/terrain-texture3.bmp", NULL, NULL, NULL);
 	
+	Sky mysky("textures/SkyBox");
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -91,11 +94,13 @@ int main(){
 		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		myterrain.terrainShader.Use();  
+		mysky.skyShader.Use();
+		mysky.skyShader.SetNontransCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
+		mysky.render();
 
+		myterrain.terrainShader.Use();  
 		myterrain.terrainShader.SetDefaultLight();
 		myterrain.terrainShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
-		
 		myterrain.render();
 
 		glfwSwapBuffers(window);

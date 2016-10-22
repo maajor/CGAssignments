@@ -156,6 +156,19 @@ public:
 		glUniform3f(glGetUniformLocation(this->Program, "ViewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	}
 
+	void SetNontransCameraProperty(int width, int height, float near, float far, Camera camera){
+		// Create camera transformations
+		glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)width / (GLfloat)height, near, far);
+		// Get the uniform locations
+		GLint viewLoc = glGetUniformLocation(this->Program, "view");
+		GLint projLoc = glGetUniformLocation(this->Program, "projection");
+		// Pass the matrices to the shader
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniform3f(glGetUniformLocation(this->Program, "ViewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+	}
+
 private:
     void checkCompileErrors(GLuint shader, std::string type)
 	{

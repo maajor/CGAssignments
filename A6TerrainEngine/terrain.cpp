@@ -229,7 +229,7 @@ void Terrain::loadTexture(const GLchar* diffuse, const GLchar* specular, const G
 }
 
 void Terrain::render(){
-	glm::mat4 model = glm::mat4();;
+	glm::mat4 model = glm::mat4();
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 	glActiveTexture(texDiffuse);
