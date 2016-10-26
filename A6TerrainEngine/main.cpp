@@ -19,6 +19,7 @@
 
 #include "terrain.h"
 #include "Sky.h"
+#include "Water.h"
 
 GLuint screenWidth = 800, screenHeight = 600;
 
@@ -80,6 +81,8 @@ int main(){
 	
 	Sky mysky("textures/SkyBox");
 
+	Water mywater(100, 0.22f);
+	mywater.loadTexture("textures/SkyBox5.bmp", NULL, NULL);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -93,7 +96,7 @@ int main(){
 
 		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		mysky.skyShader.Use();
 		mysky.skyShader.SetNontransCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
 		mysky.render();
@@ -102,6 +105,10 @@ int main(){
 		myterrain.terrainShader.SetDefaultLight();
 		myterrain.terrainShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
 		myterrain.render();
+		
+		mywater.waterShader.Use();
+		mywater.waterShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
+		mywater.render(mysky.cubeTex);
 
 		glfwSwapBuffers(window);
 

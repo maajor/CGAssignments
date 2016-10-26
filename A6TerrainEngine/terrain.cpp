@@ -3,8 +3,8 @@
 
 Terrain::Terrain(Shader shader)
 {
-	this->gridSize = 0.01f;
-	this->heightScale = 0.001f;
+	this->gridSize = 0.04f;
+	this->heightScale = 0.004f;
 	this->terrainShader = shader;
 }
 
@@ -32,7 +32,7 @@ void Terrain::loadHeightmap(const GLchar* pathname){
 
 	if (file == NULL) return ;
 	
-	this->verticesSize = this->width * this->height;
+	this->verticesSize = this->width  * this->height + 2 * (this->width  + this->height);
 	this->faceSize = (width - 1) * (height - 1) * 2;
 	unsigned char* data = new unsigned char[this->verticesSize]; // allocate 1 bytes per pixel
 	fread(data, this->verticesSize, 1, file);
@@ -44,19 +44,20 @@ void Terrain::loadHeightmap(const GLchar* pathname){
 
 	this->vertices = new GLfloat[this->verticesSize * 8];
 
-	for (int i = 0; i < this->width * this->height; ++i)
+
+	for (int i = 2 * (this->width + this->height); i < this->verticesSize; ++i)
 	{
 		int vetHeight = (int)data[i];
-		int vetIndex = 8 * i;
-		int x = i / this->height;
-		int z = i - x * this->height;
+		int vetIndex = 8 * (i - (2 * (this->width + this->height)));
+		int x = (i - (2 * (this->width + this->height))) / this->height;
+		int z = (i - (2 * (this->width + this->height))) - x * this->height;
 
-		if (i > 255*255){
+		if (i < 8*256){
 			//std::cout << i << " height: " << vetHeight << std::endl;
 		}
 
-		this->vertices[vetIndex] = x * this->gridSize;
-		this->vertices[vetIndex + 2] = z * this->gridSize;
+		this->vertices[vetIndex] = x * this->gridSize - this->height * this->gridSize / 2;
+		this->vertices[vetIndex + 2] = z * this->gridSize - this->width * this->gridSize / 2;
 		this->vertices[vetIndex + 1] = vetHeight * this->heightScale;
 
 		this->vertices[vetIndex + 6] = z * dz;

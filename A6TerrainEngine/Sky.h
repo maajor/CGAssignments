@@ -18,8 +18,9 @@ public:
 
 	Shader skyShader;
 
-private:
 	GLuint cubeTex;
+
+private:
 
 	GLuint skyVAO, skyVBO;
 
