@@ -233,9 +233,21 @@ void Terrain::render(){
 	glm::mat4 model = glm::mat4();
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-	glActiveTexture(texDiffuse);
-	glBindTexture(GL_TEXTURE_2D, texDiffuse);
+	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_diffuse1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texDiffuse);
+
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_specular1"), 1);
+	glBindTexture(GL_TEXTURE_2D, texSpec);
+
+	glActiveTexture(GL_TEXTURE2);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_normal1"), 2);
+	glBindTexture(GL_TEXTURE_2D, texNorm);
+
+	glActiveTexture(GL_TEXTURE3);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_detail1"), 3);
+	glBindTexture(GL_TEXTURE_2D, texDeta);
 
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->faceSize * 3, GL_UNSIGNED_INT, 0);

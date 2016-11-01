@@ -16,7 +16,7 @@ public:
 
 	Shader waterShader;
 
-	void loadTexture(const GLchar* diffuse, const GLchar* normal, const GLchar* normal2);
+	void loadTexture(const GLchar* diffuse, const GLchar* normal, const GLchar* normal2, const GLchar* flow, const GLchar* noise);
 
 
 private:
@@ -24,6 +24,6 @@ private:
 
 	//GLfloat* vertices;
 	GLuint VAO, VBO;
-	GLuint texDiffuse, texNormal, texNormal2;
+	GLuint texDiffuse, texNormal, texNormal2, texFlow, texNoise;
 };
 

@@ -71,11 +71,13 @@ void main()
 
 vec3 CalcDirColor(DirLight light, vec3 normal, vec3 viewDir){
 	vec3 albeido = VertexColor * vec3(texture(texture_diffuse1, Texcoord));
+	vec2 detailTil = vec2(5.0f, 5.0f);
+	vec3 detail = vec3(texture(texture_detail1, Texcoord * detailTil));
 	//vec3 albeido = VertexColor;
 	vec3 diffuse = (0.5f * dot(light.direction, normal) + 0.5f) * light.lightColor * albeido;
 	vec3 halfDir = normalize(viewDir + light.direction);
 	vec3 specular = pow(max(dot(normal, halfDir), 0), 32) * light.lightColor * albeido * vec3(texture(texture_specular1, Texcoord));
-	return (diffuse + specular);
+	return (diffuse * detail + specular);
 }
 
 vec3 CalcPointColor(PointLight light, vec3 worldPos, vec3 normal, vec3 viewDir){

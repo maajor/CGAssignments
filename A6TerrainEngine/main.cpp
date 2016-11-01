@@ -77,12 +77,12 @@ int main(){
 
 	Terrain myterrain(shader);
 	myterrain.loadHeightmap("textures/heightmap.bmp");
-	myterrain.loadTexture("textures/terrain-texture3.bmp", NULL, NULL, NULL);
+	myterrain.loadTexture("textures/terrain-texture3.bmp", NULL, NULL, "textures/detail.bmp");
 	
 	Sky mysky("textures/SkyBox");
 
 	Water mywater(100, 0.22f);
-	mywater.loadTexture("textures/SkyBox5.bmp", NULL, NULL);
+	mywater.loadTexture("textures/SkyBox5.bmp", "textures/wave0.png", "textures/wave1.png", "textures/flowmap.png", "textures/noise.png");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -107,6 +107,7 @@ int main(){
 		myterrain.render();
 		
 		mywater.waterShader.Use();
+		mywater.waterShader.SetDefaultLight();
 		mywater.waterShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
 		mywater.render(mysky.cubeTex);
 
