@@ -11,6 +11,8 @@ uniform sampler2D texture_specular1;
 uniform sampler2D texture_normal1;
 uniform sampler2D texture_detail1;
 
+uniform vec4 clipping;
+
 uniform vec3 ViewPos;
 uniform vec3 AmbientColor;
 
@@ -53,6 +55,10 @@ vec3 CalcSpotColor(SpotLight spotLight, vec3 worldPos, vec3 normal, vec3 viewDir
 
 void main()
 {
+	float clipPos = dot(WorldPos, clipping.xyz) + clipping.w;
+	if (clipPos < 0.0) {
+		discard;
+	}
 	vec3 ViewDir = normalize(vec3(ViewPos - WorldPos));
 	vec3 norm = normalize(Normal);
 	vec3 result = AmbientColor;

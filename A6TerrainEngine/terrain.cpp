@@ -19,7 +19,7 @@ Terrain::~Terrain()
 }
 
 
-void Terrain::loadHeightmap(const GLchar* pathname){
+void Terrain::loadHeightmap(const GLchar* pathname, float heightoffset){
 	FILE * file;
 
 	fopen_s(&file, pathname, "rb");
@@ -58,7 +58,7 @@ void Terrain::loadHeightmap(const GLchar* pathname){
 
 		this->vertices[vetIndex] = x * this->gridSize - this->height * this->gridSize / 2;
 		this->vertices[vetIndex + 2] = z * this->gridSize - this->width * this->gridSize / 2;
-		this->vertices[vetIndex + 1] = vetHeight * this->heightScale;
+		this->vertices[vetIndex + 1] = vetHeight * this->heightScale + heightoffset;
 
 		this->vertices[vetIndex + 6] = z * dz;
 		this->vertices[vetIndex + 7] = 1 - x * dx;
@@ -232,6 +232,90 @@ void Terrain::loadTexture(const GLchar* diffuse, const GLchar* specular, const G
 void Terrain::render(){
 	glm::mat4 model = glm::mat4();
 	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	glUniform4f(glGetUniformLocation(terrainShader.Program, "clipping"), 0, 0, 0, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_diffuse1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texDiffuse);
+
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_specular1"), 1);
+	glBindTexture(GL_TEXTURE_2D, texSpec);
+
+	glActiveTexture(GL_TEXTURE2);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_normal1"), 2);
+	glBindTexture(GL_TEXTURE_2D, texNorm);
+
+	glActiveTexture(GL_TEXTURE3);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_detail1"), 3);
+	glBindTexture(GL_TEXTURE_2D, texDeta);
+
+	glBindVertexArray(this->VAO);
+	glDrawElements(GL_TRIANGLES, this->faceSize * 3, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void Terrain::renderAboveWater(){
+	glm::mat4 model = glm::mat4();
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	glUniform4f(glGetUniformLocation(terrainShader.Program, "clipping"), 0, 1, 0, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_diffuse1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texDiffuse);
+
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_specular1"), 1);
+	glBindTexture(GL_TEXTURE_2D, texSpec);
+
+	glActiveTexture(GL_TEXTURE2);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_normal1"), 2);
+	glBindTexture(GL_TEXTURE_2D, texNorm);
+
+	glActiveTexture(GL_TEXTURE3);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_detail1"), 3);
+	glBindTexture(GL_TEXTURE_2D, texDeta);
+
+	glBindVertexArray(this->VAO);
+	glDrawElements(GL_TRIANGLES, this->faceSize * 3, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void Terrain::renderReflection(){
+	glm::mat4 model = glm::mat4();
+	model = glm::scale(model, glm::vec3(1, -1, 1));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	glUniform4f(glGetUniformLocation(terrainShader.Program, "clipping"), 0, -1, 0, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_diffuse1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texDiffuse);
+
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_specular1"), 1);
+	glBindTexture(GL_TEXTURE_2D, texSpec);
+
+	glActiveTexture(GL_TEXTURE2);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_normal1"), 2);
+	glBindTexture(GL_TEXTURE_2D, texNorm);
+
+	glActiveTexture(GL_TEXTURE3);
+	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_detail1"), 3);
+	glBindTexture(GL_TEXTURE_2D, texDeta);
+
+	glBindVertexArray(this->VAO);
+	glDrawElements(GL_TRIANGLES, this->faceSize * 3, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void Terrain::renderRefraction(){
+	glm::mat4 model = glm::mat4();
+	glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	glUniform4f(glGetUniformLocation(terrainShader.Program, "clipping"), 0, -1, 0, 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(terrainShader.Program, "texture_diffuse1"), 0);

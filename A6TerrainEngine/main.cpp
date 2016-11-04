@@ -76,13 +76,38 @@ int main(){
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	Terrain myterrain(shader);
-	myterrain.loadHeightmap("textures/heightmap.bmp");
+	myterrain.loadHeightmap("textures/heightmap.bmp", -0.22f);
 	myterrain.loadTexture("textures/terrain-texture3.bmp", NULL, NULL, "textures/detail.bmp");
 	
 	Sky mysky("textures/SkyBox");
 
-	Water mywater(100, 0.22f);
+	Water mywater(100, 0.0f);
 	mywater.loadTexture("textures/SkyBox5.bmp", "textures/wave0.png", "textures/wave1.png", "textures/flowmap.png", "textures/noise.png");
+
+	
+	// Framebuffers
+	GLuint reflectionBuffer;
+	glGenFramebuffers(1, &reflectionBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
+	// Create a color attachment texture
+
+	GLuint reflectionTexture;
+	glGenTextures(1, &reflectionTexture);
+	glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reflectionTexture, 0);
+	
+	GLuint refractionTexture;
+	glGenTextures(1, &refractionTexture);
+	glBindTexture(GL_TEXTURE_2D, refractionTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, refractionTexture, 0);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -101,16 +126,33 @@ int main(){
 		mysky.skyShader.SetNontransCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
 		mysky.render();
 
+		
 		myterrain.terrainShader.Use();  
 		myterrain.terrainShader.SetDefaultLight();
 		myterrain.terrainShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
-		myterrain.render();
+
+		//render refraction texture
+		glBindFramebuffer(GL_FRAMEBUFFER, reflectionBuffer);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		myterrain.renderReflection();
+
+		//render reflection texture
+		glDrawBuffer(GL_COLOR_ATTACHMENT1);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		myterrain.renderRefraction();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		//render above water terrain
+		myterrain.renderAboveWater();
 		
 		mywater.waterShader.Use();
 		mywater.waterShader.SetDefaultLight();
 		mywater.waterShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 1000.0f, camera);
-		mywater.render(mysky.cubeTex);
-
+		mywater.render(mysky.cubeTex, reflectionTexture, refractionTexture);
+		
 		glfwSwapBuffers(window);
 
 	}

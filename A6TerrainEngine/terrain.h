@@ -15,9 +15,14 @@ public:
 
 	Shader terrainShader;
 
-	void loadHeightmap(const GLchar* pathname);
+	void loadHeightmap(const GLchar* pathname, float heightoffset);
 	void loadTexture(const GLchar* diffuse, const GLchar* specular, const GLchar* normal, const GLchar* detail);
 	void render();
+
+	void renderReflection();
+	void renderRefraction();
+	void renderAboveWater();
+
 private:
 	int width;
 	int height;

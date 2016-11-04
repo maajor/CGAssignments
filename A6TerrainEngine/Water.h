@@ -12,7 +12,7 @@ public:
 	Water(float size,float height);
 	~Water();
 
-	void render(GLuint skyTex);
+	void render(GLuint skyTex, GLuint reflTex, GLuint refrTex);
 
 	Shader waterShader;
 

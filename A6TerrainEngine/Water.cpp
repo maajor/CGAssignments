@@ -163,7 +163,7 @@ void Water::loadTexture(const GLchar* diffuse, const GLchar* normal, const GLcha
 	std::cout << texDiffuse << " " << texNormal << " " << texNormal2 << " " << texFlow << std::endl;
 }
 
-void Water::render(GLuint skyTex){
+void Water::render(GLuint skyTex, GLuint reflTex, GLuint refrTex){
 	glUniform1i(glGetUniformLocation(this->waterShader.Program, "tilingx"), 20);
 	glUniform1i(glGetUniformLocation(this->waterShader.Program, "tilingy"), 20);
 	//glUniform1f(glGetUniformLocation(this->waterShader.Program, "_time"), Time);
@@ -203,8 +203,18 @@ void Water::render(GLuint skyTex){
 
 	glActiveTexture(GL_TEXTURE4);
 	//glBindTexture(GL_TEXTURE_2D, texFlow);
-	glUniform1i(glGetUniformLocation(this->waterShader.Program, "texture_noise"), 3);
+	glUniform1i(glGetUniformLocation(this->waterShader.Program, "texture_noise"), 4);
 	glBindTexture(GL_TEXTURE_2D, texNoise);
+
+	glActiveTexture(GL_TEXTURE5);
+	//glBindTexture(GL_TEXTURE_2D, texFlow);
+	glUniform1i(glGetUniformLocation(this->waterShader.Program, "texture_refl"), 5);
+	glBindTexture(GL_TEXTURE_2D, reflTex);
+
+	glActiveTexture(GL_TEXTURE6);
+	//glBindTexture(GL_TEXTURE_2D, texFlow);
+	glUniform1i(glGetUniformLocation(this->waterShader.Program, "texture_refr"), 6);
+	glBindTexture(GL_TEXTURE_2D, refrTex);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(this->waterShader.Program, "skybox"), 0);
