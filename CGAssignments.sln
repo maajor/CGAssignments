@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A6TerrainEngine", "A6Terrai
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A3PhysicalEngine", "A3PhysicalEngine\msvc\physics.vcxproj", "{609006E8-2F51-494E-8EDA-F42E9BB8DF0E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "B4HalfEdge", "B4HalfEdge\B4HalfEdge.vcxproj", "{7C747835-FC1F-400C-AAB6-9AD3842EB175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -36,6 +38,10 @@ Global
 		{609006E8-2F51-494E-8EDA-F42E9BB8DF0E}.Debug|Win32.Build.0 = Debug|Win32
 		{609006E8-2F51-494E-8EDA-F42E9BB8DF0E}.Release|Win32.ActiveCfg = Release|Win32
 		{609006E8-2F51-494E-8EDA-F42E9BB8DF0E}.Release|Win32.Build.0 = Release|Win32
+		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Debug|Win32.Build.0 = Debug|Win32
+		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Release|Win32.ActiveCfg = Release|Win32
+		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

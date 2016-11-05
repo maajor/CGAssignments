@@ -62,15 +62,6 @@ void main()
 
 	vec4 refraction = refrB * refrColor.w + refrColor * (1 - refrColor.w);
 
-	float NdotL = max(dot(viewDir, normalT), 0);
-
-	float facing = (1.0 - NdotL);
-
-	float fresnel = pow(facing, 5.0);
-
-	//vec2 tilT = vec2(Texcoord.x * tilingx + _time, Texcoord.y * tilingy + _time);
-	//vec4 texresult = texture(texture_diffuse, tilT);
-
 	//dirlight highlight
 	vec3 halfDir = normalize(viewDir + dirlight.direction);
 	vec3 specular = pow(max(dot(normalT, halfDir), 0), 32) * dirlight.lightColor;

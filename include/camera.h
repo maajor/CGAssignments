@@ -124,8 +124,8 @@ public:
 		float distance = glm::distance(this->Position, this->Target);
 		//xoffset *= this->MouseSensitivity;
 		//yoffset *= this->MouseSensitivity;
-		xoffset *= 0.001;
-		yoffset *= 0.001;
+		xoffset *= 0.001f;
+		yoffset *= 0.001f;
 		
 		glm::mat4 trans;
 		trans = glm::rotate(trans, xoffset, this->WorldUp);
@@ -138,8 +138,8 @@ public:
 		//std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
 	}
 	void ProcessMousePan(GLfloat xoffset, GLfloat yoffset){
-		xoffset *= 0.001;
-		yoffset *= 0.001;
+		xoffset *= 0.001f;
+		yoffset *= 0.001f;
 
 		this->Position += yoffset * this->Up + xoffset * this->Right;
 		this->Target += yoffset * this->Up + xoffset * this->Right;
