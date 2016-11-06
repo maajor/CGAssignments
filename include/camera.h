@@ -141,8 +141,10 @@ public:
 		xoffset *= 0.001f;
 		yoffset *= 0.001f;
 
-		this->Position += yoffset * this->Up + xoffset * this->Right;
-		this->Target += yoffset * this->Up + xoffset * this->Right;
+		glm::vec3 currentUp = glm::normalize(glm::cross(this->Right, this->Front));
+
+		this->Position += yoffset * currentUp + xoffset * this->Right;
+		this->Target += yoffset * currentUp + xoffset * this->Right;
 	}
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis

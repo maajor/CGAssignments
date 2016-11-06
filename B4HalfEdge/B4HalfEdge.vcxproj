@@ -79,11 +79,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="HalfEdge.cpp" />
     <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="HalfEdge.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.glsl" />

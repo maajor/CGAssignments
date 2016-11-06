@@ -16,7 +16,7 @@
 #include "../include/shader.h"
 
 #include <SOIL.h>
-#include "HalfEdge.h"
+#include "../include/HalfEdge.h"
 
 GLuint screenWidth = 800, screenHeight = 600;
 

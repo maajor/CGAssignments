@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "headers", "headers", "{4589
 	ProjectSection(SolutionItems) = preProject
 		include\camera.h = include\camera.h
 		include\filesystem.h = include\filesystem.h
+		B4HalfEdge\HalfEdge.h = B4HalfEdge\HalfEdge.h
 		include\mesh.h = include\mesh.h
 		include\model.h = include\model.h
 		include\shader.h = include\shader.h
@@ -19,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A3PhysicalEngine", "A3PhysicalEngine\msvc\physics.vcxproj", "{609006E8-2F51-494E-8EDA-F42E9BB8DF0E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "B4HalfEdge", "B4HalfEdge\B4HalfEdge.vcxproj", "{7C747835-FC1F-400C-AAB6-9AD3842EB175}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "B5HalfEdgeShading", "B5HalfEdgeShading\B5HalfEdgeShading.vcxproj", "{F6FE3F57-86F1-4582-9BDE-F220436A4848}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +45,10 @@ Global
 		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Debug|Win32.Build.0 = Debug|Win32
 		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Release|Win32.ActiveCfg = Release|Win32
 		{7C747835-FC1F-400C-AAB6-9AD3842EB175}.Release|Win32.Build.0 = Release|Win32
+		{F6FE3F57-86F1-4582-9BDE-F220436A4848}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F6FE3F57-86F1-4582-9BDE-F220436A4848}.Debug|Win32.Build.0 = Debug|Win32
+		{F6FE3F57-86F1-4582-9BDE-F220436A4848}.Release|Win32.ActiveCfg = Release|Win32
+		{F6FE3F57-86F1-4582-9BDE-F220436A4848}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
