@@ -1,0 +1,35 @@
+﻿生成启动时间为 2016-11-13 01:17:47。
+     1>项目“D:\GraduateYear2\ComputerGraphic\CGAssignments\B8MeshSimplification\B8MeshSimplification.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>d:\graduateyear2\computergraphic\cgassignments\include\shader.h(71): warning C4101: “success”: 未引用的局部变量
+     1>d:\graduateyear2\computergraphic\cgassignments\include\shader.h(72): warning C4101: “infoLog”: 未引用的局部变量
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(284): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(287): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(294): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(305): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(391): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(399): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(402): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(424): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(483): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(492): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(493): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(567): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(571): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(581): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\graduateyear2\computergraphic\cgassignments\include\halfedge.h(624): warning C4018: “<”: 有符号/无符号不匹配
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\B8MeshSimplification.exe" /INCREMENTAL /NOLOGO "assimp-vc120-mt.lib" opengl32.lib glfw3.lib glew32s.lib SOIL.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\B8MeshSimplification.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\B8MeshSimplification.lib" /MACHINE:X86 /PROFILE /Profile Debug\main.obj
+     1>LINK : warning LNK4075: 忽略“/INCREMENTAL”(由于“/PROFILE”规范)
+     1>main.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/OPT:LBR”规范)
+     1>LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+     1>LINK : warning LNK4098: 默认库“LIBCMT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+     1>glew32s.lib(glew.obj) : warning LNK4099: 未找到 PDB“vc120.pdb”(使用“glew32s.lib(glew.obj)”或在“D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\vc120.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+         B8MeshSimplification.vcxproj -> D:\GraduateYear2\ComputerGraphic\CGAssignments\Debug\B8MeshSimplification.exe
+     1>已完成生成项目“D:\GraduateYear2\ComputerGraphic\CGAssignments\B8MeshSimplification\B8MeshSimplification.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.41

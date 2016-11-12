@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <glm\glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -22,6 +23,9 @@ class Vertex;
 class Face;
 class HalfEdgeMesh;
 class HalfEdgeModel;
+class Quadric;
+class pairInfo;
+class pairInfoLess;
 
 class HalfEdge
 {
@@ -41,11 +45,12 @@ public:
 };
 
 class Vertex{
-//public:
+public:
 	HalfEdge *halfedge;
 	glm::vec3 normal;
 	glm::vec3 position;
 	int index;
+	int indegree;
 
 	friend class HalfEdgeModel;
 	friend class HalfEdgeMesh;
@@ -62,12 +67,12 @@ public:
 class Face{
 //public:
 	HalfEdge *halfedge;
-	std::vector<int> indice;
 	int index;
 
 	friend class HalfEdgeModel;
 	friend class HalfEdgeMesh;
 public:
+	std::vector<int> indice;
 	Face(){}
 	~Face(){}
 	std::vector<int> getIndices() const { return indice; }
@@ -83,15 +88,328 @@ public:
 	
 };
 
+class Quadric{
+	float r;
+	glm::mat4 K;
+public:
+
+	Quadric(){
+		K = glm::mat4(0);
+		r = 1;
+	}
+	Quadric(double a, double b, double c, double d, float area){
+		K = glm::mat4(
+			a*a, a*b, a*c, a*d,
+			a*b, b*b, b*c, b*d,
+			a*c, b*c, c*c, d*c,
+			a*d, b*d, c*d, d*d
+			);
+		r = area;
+	}
+	Quadric(const Quadric& Q) { *this = Q; }
+
+	Quadric& Quadric::operator+=(const Quadric& Q)
+	{
+		r += Q.r;
+		K += Q.K;
+
+		return *this;
+	}
+	Quadric& Quadric::operator+(const Quadric& Q)
+	{
+		r += Q.r;
+		K += Q.K;
+
+		return *this;
+	}
+	glm::mat4 K3Homo(){
+		//glm is column-major
+		return glm::mat4(
+			K[0][0], K[1][0], K[2][0], 0,
+			K[0][1], K[1][1], K[2][1], 0,
+			K[0][2], K[1][2], K[2][2], 0,
+			K[0][3], K[1][3], K[2][3], 1
+			);
+	}
+	glm::mat4 getK(){
+		return K;
+	}
+
+};
+
+class pairInfo{
+	double cost;
+
+public:
+	int vertId1, vertId2;
+	glm::vec4 averageVert;
+	pairInfo(){};
+	pairInfo(int id1, int id2){
+		vertId1 = id1; vertId2 = id2;
+	}
+	pairInfo(const pairInfo& pair2){ *this = pair2; }
+
+	void caluCost(glm::vec3 pos1, glm::vec3 pos2, Quadric k1, Quadric k2){
+		Quadric ksum;
+		ksum = k1 + k2;
+		glm::mat4 homo = ksum.K3Homo();
+		float det = glm::determinant(homo);
+		if (det < 1e-12 && det > -1e-12){
+			averageVert = glm::vec4(pos1, 1);
+		}
+		else{
+			glm::mat4 reversed = glm::inverse(homo);
+			averageVert = reversed * glm::vec4(0, 0, 0, 1);
+		}
+		cost = glm::dot(averageVert, (ksum.getK() * averageVert));
+	}
+
+	glm::vec4 caluAverage(glm::vec3 pos1, glm::vec3 pos2, Quadric k1, Quadric k2){
+		Quadric ksum;
+		ksum = k1 + k2;
+		glm::mat4 homo = ksum.K3Homo();
+		float det = glm::determinant(homo);
+		if (det < 1e-12 && det > -1e-12){
+			averageVert = glm::vec4(pos1, 1);
+		}
+		else{
+			glm::mat4 reversed = glm::inverse(homo);
+			averageVert = reversed * glm::vec4(0, 0, 0, 1);
+		}
+		return averageVert;
+	}
+
+	double getCost(){
+		return cost;
+	}
+
+	bool operator<(const pairInfo& pair){
+		return cost > pair.cost;
+	}
+};
+/*
+class pairInfoLess{
+public:
+	bool operator ()(const pairInfo & a, const pairInfo & b)
+	{
+		return a.cost>b.cost;
+	}
+};
+*/
 class HalfEdgeMesh{
 	std::vector<Face*> faces;
 	std::vector<Vertex*> vertices;
 	std::vector<HalfEdge*> halfedges;
-	std::map<std::pair<pos, pos>, HalfEdge*> edgeMap;
+	std::map<std::pair<int, int>, HalfEdge*> edgeMap;
+
+	std::vector<Quadric> verticesQuadrics;
 
 	std::vector<float> verticesData;
 	std::vector<GLuint> indicesData;
+
+	//std::priority_queue<pairInfo,std::vector<pairInfo>, pairInfoLess> pairsHeap;
+	std::vector<pairInfo> pairsHeap;
+
+	int validVert;
+
 	GLuint VAO, VBO, EBO;
+
+	bool contractPair(pairInfo targetPair){
+		int id1 = targetPair.vertId1;
+		int id2 = targetPair.vertId2;
+
+		if (id1 == 968 || id1 == 781 || id2 == 968 || id2 == 781){
+			std::cout << " ";
+		}
+
+		if (id1 == id2)
+			return false;
+
+		glm::vec3 averVertPos = glm::vec3(targetPair.averageVert);
+		//glm::vec3 averVertPos = glm::vec3(targetPair.caluAverage(vertices[id1]->position, vertices[id2]->position, verticesQuadrics[id1], verticesQuadrics[id2]));
+		int idMerged = id1;
+		Quadric quadricMerged;
+		quadricMerged = verticesQuadrics[id1] + verticesQuadrics[id2];
+
+		//update infos
+
+		vertices[id1]->position = averVertPos;
+		verticesQuadrics[id1] = quadricMerged;
+		verticesQuadrics[id2] = quadricMerged;
+
+		//if (edgeMap[std::make_pair(id1, id2)] == NULL)
+		//	return false;
+		HalfEdge* thisHalfEdge = edgeMap[std::make_pair(id1, id2)];
+		HalfEdge* pairHalfEdge = thisHalfEdge->pair;
+
+		int id3 = thisHalfEdge->next->end->index;
+		int id4 = pairHalfEdge->next->end->index;
+
+		//if (vertices[id1]->indegree <= 3 || vertices[id2]->indegree <= 3 || vertices[id3]->indegree <= 3 || vertices[id4]->indegree <= 3){
+		//	//prevent non-manifold
+		//	return false;
+		//}
+		vertices[id1]->indegree--;
+		vertices[id2]->indegree--;
+		vertices[id3]->indegree--;
+		vertices[id4]->indegree--;
+
+		thisHalfEdge->next->pair->pair = thisHalfEdge->prev->pair;
+		thisHalfEdge->prev->pair->pair = thisHalfEdge->next->pair;
+		pairHalfEdge->next->pair->pair = pairHalfEdge->prev->pair;
+		pairHalfEdge->prev->pair->pair = pairHalfEdge->next->pair;
+
+		vertices[id1]->halfedge = thisHalfEdge->prev->pair;
+		vertices[id2]->halfedge = pairHalfEdge->prev->pair;
+		vertices[id3]->halfedge = thisHalfEdge->next->pair;
+		vertices[id4]->halfedge = pairHalfEdge->next->pair;
+
+		Face* face1 = thisHalfEdge->face;
+		Face* face2 = pairHalfEdge->face;
+
+		//delete face1 face2 and halfedges on faces
+		faces[face1->index] = NULL;
+		faces[face2->index] = NULL;
+
+		halfedges[thisHalfEdge->index] = NULL;
+		halfedges[thisHalfEdge->next->index] = NULL;
+		halfedges[thisHalfEdge->prev->index] = NULL;
+
+		halfedges[pairHalfEdge->index] = NULL;
+		halfedges[pairHalfEdge->next->index] = NULL;
+		halfedges[pairHalfEdge->prev->index] = NULL;
+
+		//vertices[id2] = NULL;
+
+		for (int i = 0; i < faces.size(); i++){
+			if (faces[i] == NULL)
+				continue;
+			for (int j = 0; j < faces[i]->indice.size(); j++){
+				if (faces[i]->indice[j] == id2){
+					faces[i]->indice[j] = id1;
+				}
+			}
+		}
+
+		for (int i = 0; i < halfedges.size(); i++){
+			if (halfedges[i] == NULL)
+				continue;
+			if (halfedges[i]->start->index == id2){
+				halfedges[i]->start = vertices[id1];
+			}
+			if (halfedges[i]->end->index == id2){
+				halfedges[i]->end = vertices[id1];
+			}
+		}
+
+		for (int i = 0; i < pairsHeap.size(); i++){
+			int ida = pairsHeap[i].vertId1;
+			int idb = pairsHeap[i].vertId2;
+			bool sameFlag = false;
+			if (ida == id2){
+				ida = id1;
+				pairsHeap[i].vertId1 = id1;
+				sameFlag = true;
+			}
+			if (idb == id2){
+				idb = id1;
+				pairsHeap[i].vertId2 = id1;
+				sameFlag = true;
+			}
+			if (sameFlag){
+				pairsHeap[i].caluCost(vertices[ida]->position, vertices[idb]->position, verticesQuadrics[ida], verticesQuadrics[idb]);
+			}
+		}
+		std::make_heap(pairsHeap.begin(), pairsHeap.end());
+
+		edgeMap[std::make_pair(id1, id2)] = NULL;
+		edgeMap[std::make_pair(id2, id1)] = NULL;
+		edgeMap[std::make_pair(id2, id3)] = NULL;
+		edgeMap[std::make_pair(id3, id1)] = NULL;
+		edgeMap[std::make_pair(id1, id4)] = NULL;
+		edgeMap[std::make_pair(id4, id2)] = NULL;
+		
+		
+		
+		std::map<std::pair<int, int>, HalfEdge*> newMap;
+		std::map<std::pair<int, int>, HalfEdge*>::iterator it;
+		for (it = edgeMap.begin(); it != edgeMap.end(); ++it)
+		{
+			if (it->second == NULL){
+				continue;
+			}
+			if (it->first.first == id2 && it->first.second == id2){
+				//newMap[std::make_pair(id1, id1)] = it->second;
+				continue;
+			}
+			else if (it->first.first == id2 && it->first.second != id3){
+				newMap[std::make_pair(id1, it->first.second)] = it->second;
+			}
+			else if (it->first.second == id2 && it->first.first != id4){
+				newMap[std::make_pair(it->first.first, id1)] = it->second;
+			}
+			else {
+				newMap[it->first] = it->second;
+			}
+		}
+		//newMap[std::make_pair(id1, id3)] = edgeMap[std::make_pair(id2, id3)];
+		newMap[std::make_pair(id3, id1)] = edgeMap[std::make_pair(id3, id2)];
+		newMap[std::make_pair(id1, id4)] = edgeMap[std::make_pair(id2, id4)];
+		//newMap[std::make_pair(id4, id1)] = edgeMap[std::make_pair(id4, id2)];
+		edgeMap.clear();
+		edgeMap = newMap;
+		
+		//vertices[id2] = NULL;
+		
+		delete(thisHalfEdge->next);
+		delete(thisHalfEdge->prev);
+		delete(thisHalfEdge);
+
+		delete(pairHalfEdge->next);
+		delete(pairHalfEdge->prev);
+		delete(pairHalfEdge);
+
+		delete(face1);
+		delete(face2);
+
+
+		//clean up
+		Vertex* oldVert = vertices[id2];
+		delete(oldVert);
+		vertices[id2] = NULL;
+		
+		return true;
+		//do not clean verticesQuadrics, which should be cleaned after whole simplification
+
+	}
+
+	void resetMeshData(){
+		std::map<int, int> remapVert;
+		std::vector<Vertex*> newVets;
+		std::vector <Face*> newFaces;
+
+		for (int i = 0; i < vertices.size(); i++){
+			if (vertices[i] != NULL){
+				newVets.push_back(vertices[i]);
+				newVets.back()->index = newVets.size() - 1;
+				remapVert[i] = newVets.size() - 1;
+			}
+		}
+
+		for (int i = 0; i < faces.size(); i++){
+			if (faces[i] != NULL){
+				faces[i]->index = newFaces.size();
+				for (int j = 0; j < faces[i]->indice.size(); j++){
+					faces[i]->indice[j] = remapVert[faces[i]->indice[j]];
+				}
+				newFaces.push_back(faces[i]);
+			}
+		}
+
+		*this = HalfEdgeMesh(newVets, newFaces);
+
+	}
+
 
 public:
 	HalfEdgeMesh(){}
@@ -100,6 +418,7 @@ public:
 		halfedges.clear();
 		faces = facs;
 		vertices = vets;
+		validVert = vets.size();
 
 		//loop faces to set edges and faces
 		for (int i = 0; i < faces.size(); i++){
@@ -116,24 +435,25 @@ public:
 				HalfEdge *thisHalfEdge = new HalfEdge();
 				thisHalfEdge->index = offsetSize + j;
 				thisHalfEdge->start = vertices[faces[i]->indice[thisVet]];
+				vertices[faces[i]->indice[thisVet]]->indegree++;
 				thisHalfEdge->end = vertices[faces[i]->indice[nextVet]];
 				thisHalfEdge->face = faces[i];
 				halfedges.push_back(thisHalfEdge);
 				vertices[faces[i]->indice[thisVet]]->halfedge = thisHalfEdge;
 
-				pos startPos;
+				/*pos startPos;
 				startPos.x = thisHalfEdge->start->position.x;
 				startPos.y = thisHalfEdge->start->position.y;
 				startPos.z = thisHalfEdge->start->position.z;
 				pos endPos;
 				endPos.x = thisHalfEdge->end->position.x;
 				endPos.y = thisHalfEdge->end->position.y;
-				endPos.z = thisHalfEdge->end->position.z;
+				endPos.z = thisHalfEdge->end->position.z;*/
 				//find pairedge
-				edgeMap[std::make_pair(startPos, endPos)] = thisHalfEdge;
+				edgeMap[std::make_pair(faces[i]->indice[thisVet], faces[i]->indice[nextVet])] = thisHalfEdge;
 				HalfEdge *pairEdge;
-				if (edgeMap.count(std::make_pair(endPos, startPos))) {
-					pairEdge = edgeMap[std::make_pair(endPos, startPos)];
+				if (edgeMap.count(std::make_pair(faces[i]->indice[nextVet], faces[i]->indice[thisVet]))) {
+					pairEdge = edgeMap[std::make_pair(faces[i]->indice[nextVet], faces[i]->indice[thisVet])];
 					pairEdge->pair = thisHalfEdge;
 					thisHalfEdge->pair = pairEdge;
 				}
@@ -211,6 +531,75 @@ public:
 		glBindVertexArray(0);
 	}
 
+	void quadricSimplify(int times){
+		collect_quadrics();
+
+		//To Do.
+		//Constraint Boundaries!
+
+		collect_pairs();
+
+
+		while (times > 0 && pairsHeap.size() > 0 && validVert > 4){
+			pairInfo currentPair;
+			std::pop_heap(pairsHeap.begin(), pairsHeap.end());
+			currentPair = pairsHeap.back();
+			pairsHeap.pop_back();
+			//std::cout << currentPair.getCost() << std::endl;
+
+			if (contractPair(currentPair)){
+				validVert--;
+				times--;
+			}
+		}
+
+		resetMeshData();
+
+		//std::cout << "finish" << std::endl;
+
+	}
+
+	void collect_quadrics(){
+		pairsHeap.empty();
+		std::make_heap(pairsHeap.begin(), pairsHeap.end());
+
+		verticesQuadrics.clear();
+		for (int i = 0; i < vertices.size(); i++){
+			verticesQuadrics.push_back(Quadric());
+		}
+		
+		for (int i = 0; i < faces.size(); i++){
+			std::vector<int> f = faces[i]->getIndices();
+			glm::vec4 plane = calcPlane(vertices[f[0]]->position, vertices[f[1]]->position, vertices[f[2]]->position);
+			verticesQuadrics[f[0]] += Quadric(plane.x, plane.y, plane.z, plane.w, 1);
+			verticesQuadrics[f[1]] += Quadric(plane.x, plane.y, plane.z, plane.w, 1);
+			verticesQuadrics[f[2]] += Quadric(plane.x, plane.y, plane.z, plane.w, 1);
+		}
+	}
+
+	void collect_pairs(){
+		for (int i = 0; i < halfedges.size(); i++){
+			int id1 = halfedges[i]->start->index;
+			int id2 = halfedges[i]->end->index;
+			if (id1 > id2){
+				pairInfo thispair(id1, id2);
+				thispair.caluCost(vertices[id1]->position, vertices[id2]->position, verticesQuadrics[id1], verticesQuadrics[id2]);
+				pairsHeap.push_back(thispair);
+				std::push_heap(pairsHeap.begin(), pairsHeap.end());
+			}
+		}
+	}
+
+	glm::vec4 calcPlane(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3){
+		glm::vec3 normal = glm::cross(v2 - v1, v3 - v1);
+		glm::normalize(normal);
+		return glm::vec4(normal, -glm::dot(normal, v1));
+	}
+
+	int vertexSize(){
+		return vertices.size();
+	}
+
 };
 
 class HalfEdgeModel{
@@ -227,6 +616,17 @@ public:
 	}
 	HalfEdgeModel(){}
 
+	void quadricSimplify(double percentToPreserve){
+		if (percentToPreserve > 1)
+			percentToPreserve = 1;
+		if (percentToPreserve < 0)
+			percentToPreserve = 0.01;
+		for (int i = 0; i < this->meshes.size(); i++){
+			int totalVert = this->meshes[i].vertexSize();
+			this->meshes[i].quadricSimplify(totalVert*(1 - percentToPreserve));
+		}
+	}
+
 	void Draw(Shader shader)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelTransform));
@@ -238,7 +638,7 @@ public:
 	{
 		// Read file via ASSIMP
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals  | aiProcess_Triangulate  | aiProcess_GenSmoothNormals);
 		// Check for errors
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
@@ -317,6 +717,7 @@ public:
 				vertex->normal = vector;
 			}
 			vertex->index = i;
+			vertex->indegree = 0;
 			// Texture Coordinates
 			vertices.push_back(vertex);
 		}
