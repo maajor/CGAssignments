@@ -84,17 +84,25 @@ public:
     }
 
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
-    {
-        GLfloat velocity = this->MovementSpeed * deltaTime;
-        if (direction == FORWARD)
-            this->Position += this->Front * velocity;
-        if (direction == BACKWARD)
-            this->Position -= this->Front * velocity;
-        if (direction == LEFT)
-            this->Position -= this->Right * velocity;
-        if (direction == RIGHT)
-            this->Position += this->Right * velocity;
+	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
+	{
+		GLfloat velocity = this->MovementSpeed * deltaTime;
+		if (direction == FORWARD){
+			this->Position += this->Front * velocity;
+			this->Target += this->Front * velocity;
+		}
+		if (direction == BACKWARD){
+			this->Position -= this->Front * velocity;
+			this->Target -= this->Front * velocity;
+		}
+		if (direction == LEFT){
+			this->Position -= this->Right * velocity;
+			this->Target -= this->Right * velocity;
+		}
+		if (direction == RIGHT){
+		this->Position += this->Right * velocity;
+		this->Target += this->Right * velocity;
+		}
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -131,6 +139,7 @@ public:
 		trans = glm::rotate(trans, xoffset, this->WorldUp);
 		trans = glm::rotate(trans, yoffset, this->Right);
 		this->Front = glm::mat3(trans) * this->Front;
+		this->Front = glm::normalize(this->Front);
 		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  
 		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
 
@@ -150,12 +159,18 @@ public:
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(GLfloat yoffset)
     {
+		/*
         if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
             this->Zoom -= yoffset;
         if (this->Zoom <= 1.0f)
             this->Zoom = 1.0f;
         if (this->Zoom >= 45.0f)
             this->Zoom = 45.0f;
+		*/
+
+		//GLfloat velocity = this->MovementSpeed * deltaTime;
+		this->Position += this->Front * yoffset;
+		this->Target += this->Front * yoffset;
     }
 
 private:
