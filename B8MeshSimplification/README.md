@@ -35,4 +35,7 @@ Quadric Error Metrics
 
 *注：由于GLUT不支持OpenGL3.3+，并且GLEW不提供GUI功能，实验所有的交互不使用右键PopUpMenu，而都使用鼠标键盘。*
 
+### 实验效果
+
+![实现效果](b8.jpg)
 

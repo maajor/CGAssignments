@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <time.h>
 
 // GLEW
 #define GLEW_STATIC
@@ -21,7 +22,7 @@
 GLuint screenWidth = 800, screenHeight = 600;
 
 // Camera
-Camera camera(glm::vec3(0.5f, 2.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera(glm::vec3(-1.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
 float cursorPosX, cursorPosY;
@@ -70,11 +71,19 @@ int main(){
 	// Setup some OpenGL options
 	glEnable(GL_DEPTH_TEST);
 
-	HalfEdgeModel mymodel("eight.uniform.obj");
+	//HalfEdgeModel mymodel("eight.uniform.obj");
+	HalfEdgeModel mymodel("bunny.obj");
+	//HalfEdgeModel mymodel("bunny_big.obj");
 	//HalfEdgeModel mymodel("cube_test.obj");
 	Shader shader("vertexShader.glsl", "fragmentShader.glsl");
 
-	mymodel.quadricSimplify(0.3);
+	//HalfEdgeModel mymodel;
+	std::cout << "before face number " << mymodel.meshes[0].faceSize() << std::endl;
+	time_t start = clock();
+	mymodel.quadricSimplify(0.04);
+	time_t end = clock();
+	std::cout << "time spend " << (double)(end - start) / CLOCKS_PER_SEC << " s "<< std::endl;
+	std::cout << "current face number " << mymodel.meshes[0].faceSize() << std::endl;
 
 	
 	while (!glfwWindowShouldClose(window))

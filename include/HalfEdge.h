@@ -122,6 +122,7 @@ public:
 
 		return *this;
 	}
+	
 	glm::mat4 K3Homo(){
 		//glm is column-major
 		return glm::mat4(
@@ -131,6 +132,16 @@ public:
 			K[0][3], K[1][3], K[2][3], 1
 			);
 	}
+	/*
+	glm::mat4 K3Homo(){
+		//glm is column-major
+		return glm::mat4(
+			K[0][0], K[0][1], K[0][2], K[0][3],
+			K[1][0], K[1][1], K[1][2], K[1][3],
+			K[2][0], K[2][1], K[2][2], K[2][3],
+			0, 0, 0, 1
+			);
+	}*/
 	glm::mat4 getK(){
 		return K;
 	}
@@ -154,8 +165,9 @@ public:
 		ksum = k1 + k2;
 		glm::mat4 homo = ksum.K3Homo();
 		float det = glm::determinant(homo);
-		if (det < 1e-12 && det > -1e-12){
-			averageVert = glm::vec4(pos1, 1);
+		if (det < 1e-11 && det > -1e-11){
+			glm::vec3 aver = pos1 + pos2;
+			averageVert = glm::vec4(aver.x/2, aver.y/2, aver.z/2, 1);
 		}
 		else{
 			glm::mat4 reversed = glm::inverse(homo);
@@ -170,7 +182,8 @@ public:
 		glm::mat4 homo = ksum.K3Homo();
 		float det = glm::determinant(homo);
 		if (det < 1e-12 && det > -1e-12){
-			averageVert = glm::vec4(pos1, 1);
+			glm::vec3 aver = pos1 + pos2;
+			averageVert = glm::vec4(aver.x / 2, aver.y / 2, aver.z / 2, 1);
 		}
 		else{
 			glm::mat4 reversed = glm::inverse(homo);
@@ -210,23 +223,95 @@ class HalfEdgeMesh{
 	//std::priority_queue<pairInfo,std::vector<pairInfo>, pairInfoLess> pairsHeap;
 	std::vector<pairInfo> pairsHeap;
 
-	int validVert;
+	int currentFaceNum;
 
 	GLuint VAO, VBO, EBO;
+
+	bool testCoOrient(int id1, int id2, int id3, int id4, glm::vec3 desiredPos){
+		//std::vector<glm::vec3> neighborPos;
+		std::vector<glm::vec3> towardVec;
+		//std::vector<int> neighborId;
+
+		int idnext = id3;
+		HalfEdge *edgeIter = edgeMap[std::make_pair(id1, id3)];
+		//neighborPos.push_back(vertices[id3]->position);
+
+		while (idnext != id4){
+			edgeIter = edgeIter->prev->pair;
+			idnext = edgeIter->end->index;
+			//neighborPos.push_back(vertices[idnext]->position);
+			towardVec.push_back(glm::normalize(vertices[idnext]->position - desiredPos));
+			//neighborId.push_back(idnext);
+		}
+
+		edgeIter = edgeMap[std::make_pair(id2, id4)];
+
+		while (idnext != id3){
+			edgeIter = edgeIter->prev->pair;
+			idnext = edgeIter->end->index;
+			//neighborPos.push_back(vertices[idnext]->position);
+			towardVec.push_back(glm::normalize(vertices[idnext]->position - desiredPos));
+			//neighborId.push_back(idnext);
+		}
+
+		assert(towardVec.size() >= 3);
+
+		int i2, i3;
+		for (int i1 = 0; i1 < towardVec.size(); i1++){
+			if (i1 == towardVec.size() - 1){
+				i2 = 0; i3 = 1;
+			}
+			else if (i1 == towardVec.size() - 2){
+				i2 = i1 + 1;
+				i3 = 0;
+			}
+			else{
+				i2 = i1 + 1; i3 = i1 + 2;
+			}
+			//prevent sharp corner
+			//if (glm::dot(towardVec[i1], towardVec[i2]) > 0.9){
+			//	return false;
+			//}
+
+			glm::vec3 normal1 = glm::cross(towardVec[i1], towardVec[i2]);
+			glm::vec3 normal2 = glm::cross(towardVec[i2], towardVec[i3]);
+
+			//prevent mesh inversion
+			if (glm::dot(normal1, normal2) < 0){
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	bool contractPair(pairInfo targetPair){
 		int id1 = targetPair.vertId1;
 		int id2 = targetPair.vertId2;
 
-		if (id1 == 968 || id1 == 781 || id2 == 968 || id2 == 781){
-			std::cout << " ";
-		}
-
 		if (id1 == id2)
 			return false;
 
+		HalfEdge* thisHalfEdge = edgeMap[std::make_pair(id1, id2)];
+		HalfEdge* pairHalfEdge = thisHalfEdge->pair;
+
+		int id3 = thisHalfEdge->next->end->index;
+		int id4 = pairHalfEdge->next->end->index;
+
+		//prevent mesh inversion
+		if (! testCoOrient(id1, id2, id3, id4, glm::vec3(targetPair.averageVert))){
+			return false;
+		}
+
+		//prevent non-manifold
+		if (vertices[id1]->indegree <= 3 || vertices[id2]->indegree <= 3 || vertices[id3]->indegree <= 3 || vertices[id4]->indegree <= 3){
+			return false;
+		}
+		vertices[id1]->indegree = vertices[id1]->indegree + vertices[id2]->indegree - 4;
+		vertices[id3]->indegree--;
+		vertices[id4]->indegree--;
+
 		glm::vec3 averVertPos = glm::vec3(targetPair.averageVert);
-		//glm::vec3 averVertPos = glm::vec3(targetPair.caluAverage(vertices[id1]->position, vertices[id2]->position, verticesQuadrics[id1], verticesQuadrics[id2]));
 		int idMerged = id1;
 		Quadric quadricMerged;
 		quadricMerged = verticesQuadrics[id1] + verticesQuadrics[id2];
@@ -235,24 +320,6 @@ class HalfEdgeMesh{
 
 		vertices[id1]->position = averVertPos;
 		verticesQuadrics[id1] = quadricMerged;
-		verticesQuadrics[id2] = quadricMerged;
-
-		//if (edgeMap[std::make_pair(id1, id2)] == NULL)
-		//	return false;
-		HalfEdge* thisHalfEdge = edgeMap[std::make_pair(id1, id2)];
-		HalfEdge* pairHalfEdge = thisHalfEdge->pair;
-
-		int id3 = thisHalfEdge->next->end->index;
-		int id4 = pairHalfEdge->next->end->index;
-
-		//if (vertices[id1]->indegree <= 3 || vertices[id2]->indegree <= 3 || vertices[id3]->indegree <= 3 || vertices[id4]->indegree <= 3){
-		//	//prevent non-manifold
-		//	return false;
-		//}
-		vertices[id1]->indegree--;
-		vertices[id2]->indegree--;
-		vertices[id3]->indegree--;
-		vertices[id4]->indegree--;
 
 		thisHalfEdge->next->pair->pair = thisHalfEdge->prev->pair;
 		thisHalfEdge->prev->pair->pair = thisHalfEdge->next->pair;
@@ -260,14 +327,13 @@ class HalfEdgeMesh{
 		pairHalfEdge->prev->pair->pair = pairHalfEdge->next->pair;
 
 		vertices[id1]->halfedge = thisHalfEdge->prev->pair;
-		vertices[id2]->halfedge = pairHalfEdge->prev->pair;
 		vertices[id3]->halfedge = thisHalfEdge->next->pair;
 		vertices[id4]->halfedge = pairHalfEdge->next->pair;
 
 		Face* face1 = thisHalfEdge->face;
 		Face* face2 = pairHalfEdge->face;
 
-		//delete face1 face2 and halfedges on faces
+		//makenull face1 face2 and halfedges on faces
 		faces[face1->index] = NULL;
 		faces[face2->index] = NULL;
 
@@ -279,8 +345,7 @@ class HalfEdgeMesh{
 		halfedges[pairHalfEdge->next->index] = NULL;
 		halfedges[pairHalfEdge->prev->index] = NULL;
 
-		//vertices[id2] = NULL;
-
+		//update faces
 		for (int i = 0; i < faces.size(); i++){
 			if (faces[i] == NULL)
 				continue;
@@ -291,6 +356,7 @@ class HalfEdgeMesh{
 			}
 		}
 
+		//update halfedges
 		for (int i = 0; i < halfedges.size(); i++){
 			if (halfedges[i] == NULL)
 				continue;
@@ -302,65 +368,78 @@ class HalfEdgeMesh{
 			}
 		}
 
-		for (int i = 0; i < pairsHeap.size(); i++){
-			int ida = pairsHeap[i].vertId1;
-			int idb = pairsHeap[i].vertId2;
+		//update pairHeap
+		for (std::vector<pairInfo>::iterator pairIter = pairsHeap.begin(); pairIter != pairsHeap.end();){
+			int ida = pairIter->vertId1;
+			int idb = pairIter->vertId2;
 			bool sameFlag = false;
+			if (pairIter->vertId1 == id1 && pairIter->vertId2 == id2){
+				pairIter = pairsHeap.erase(pairIter);
+				continue;
+			}
 			if (ida == id2){
-				ida = id1;
-				pairsHeap[i].vertId1 = id1;
+				//ida = id1;
+				pairIter->vertId1 = id1;
 				sameFlag = true;
 			}
 			if (idb == id2){
-				idb = id1;
-				pairsHeap[i].vertId2 = id1;
+				//idb = id1;
+				pairIter->vertId2 = id1;
 				sameFlag = true;
 			}
 			if (sameFlag){
-				pairsHeap[i].caluCost(vertices[ida]->position, vertices[idb]->position, verticesQuadrics[ida], verticesQuadrics[idb]);
+				pairIter->caluCost(vertices[pairIter->vertId1]->position, vertices[pairIter->vertId2]->position, verticesQuadrics[pairIter->vertId1], verticesQuadrics[pairIter->vertId2]);
 			}
+			pairIter++;
 		}
 		std::make_heap(pairsHeap.begin(), pairsHeap.end());
 
+		//update edgemap
+		std::map<std::pair<int, int>, HalfEdge*> newMap;
+
 		edgeMap[std::make_pair(id1, id2)] = NULL;
 		edgeMap[std::make_pair(id2, id1)] = NULL;
+
+		edgeMap[std::make_pair(id3, id1)] = edgeMap[std::make_pair(id3, id2)];
+		edgeMap[std::make_pair(id1, id4)] = edgeMap[std::make_pair(id2, id4)];
+
 		edgeMap[std::make_pair(id2, id3)] = NULL;
-		edgeMap[std::make_pair(id3, id1)] = NULL;
-		edgeMap[std::make_pair(id1, id4)] = NULL;
+		edgeMap[std::make_pair(id2, id4)] = NULL;
 		edgeMap[std::make_pair(id4, id2)] = NULL;
-		
-		
-		
-		std::map<std::pair<int, int>, HalfEdge*> newMap;
+		edgeMap[std::make_pair(id3, id2)] = NULL;
+
 		std::map<std::pair<int, int>, HalfEdge*>::iterator it;
-		for (it = edgeMap.begin(); it != edgeMap.end(); ++it)
+		for (it = edgeMap.begin(); it != edgeMap.end();)
 		{
 			if (it->second == NULL){
+				it = edgeMap.erase(it);
 				continue;
 			}
 			if (it->first.first == id2 && it->first.second == id2){
 				//newMap[std::make_pair(id1, id1)] = it->second;
+				it = edgeMap.erase(it);
 				continue;
 			}
-			else if (it->first.first == id2 && it->first.second != id3){
+			if (it->first.first == id2 && it->first.second != id3){
 				newMap[std::make_pair(id1, it->first.second)] = it->second;
+				it = edgeMap.erase(it);
+				continue;
 			}
-			else if (it->first.second == id2 && it->first.first != id4){
+			if (it->first.second == id2 && it->first.first != id4){
 				newMap[std::make_pair(it->first.first, id1)] = it->second;
+				it = edgeMap.erase(it);
+				continue;
 			}
-			else {
-				newMap[it->first] = it->second;
-			}
+			it++;
 		}
-		//newMap[std::make_pair(id1, id3)] = edgeMap[std::make_pair(id2, id3)];
-		newMap[std::make_pair(id3, id1)] = edgeMap[std::make_pair(id3, id2)];
-		newMap[std::make_pair(id1, id4)] = edgeMap[std::make_pair(id2, id4)];
-		//newMap[std::make_pair(id4, id1)] = edgeMap[std::make_pair(id4, id2)];
-		edgeMap.clear();
-		edgeMap = newMap;
-		
-		//vertices[id2] = NULL;
-		
+
+		std::map<std::pair<int, int>, HalfEdge*>::iterator itNew;
+		for (itNew = newMap.begin(); itNew != newMap.end(); itNew++)
+		{
+			edgeMap[itNew->first] = itNew->second;
+		}
+
+		//clean up useless edge and face
 		delete(thisHalfEdge->next);
 		delete(thisHalfEdge->prev);
 		delete(thisHalfEdge);
@@ -373,7 +452,7 @@ class HalfEdgeMesh{
 		delete(face2);
 
 
-		//clean up
+		//clean up vertex
 		Vertex* oldVert = vertices[id2];
 		delete(oldVert);
 		vertices[id2] = NULL;
@@ -392,6 +471,7 @@ class HalfEdgeMesh{
 			if (vertices[i] != NULL){
 				newVets.push_back(vertices[i]);
 				newVets.back()->index = newVets.size() - 1;
+				newVets.back()->normal = glm::vec3(0);
 				remapVert[i] = newVets.size() - 1;
 			}
 		}
@@ -403,7 +483,22 @@ class HalfEdgeMesh{
 					faces[i]->indice[j] = remapVert[faces[i]->indice[j]];
 				}
 				newFaces.push_back(faces[i]);
+
+				//calculate and add face normal to each vertex
+				glm::vec3 normal = glm::cross(
+					glm::vec3(newVets[faces[i]->indice[1]]->position - newVets[faces[i]->indice[0]]->position),
+					glm::vec3(newVets[faces[i]->indice[2]]->position - newVets[faces[i]->indice[0]]->position)
+					);
+				normal = glm::normalize(normal);
+				newVets[faces[i]->indice[0]]->normal += normal;
+				newVets[faces[i]->indice[1]]->normal += normal;
+				newVets[faces[i]->indice[2]]->normal += normal;
 			}
+		}
+
+		//normalize each normal
+		for (int i = 0; i < newVets.size(); i++){
+			newVets[i]->normal = glm::normalize(newVets[i]->normal);
 		}
 
 		*this = HalfEdgeMesh(newVets, newFaces);
@@ -412,13 +507,17 @@ class HalfEdgeMesh{
 
 
 public:
+	int targetFaceNum;
+
+
 	HalfEdgeMesh(){}
 	HalfEdgeMesh(std::vector<Vertex*> vets, std::vector<Face*> facs){
 		edgeMap.clear();
 		halfedges.clear();
 		faces = facs;
 		vertices = vets;
-		validVert = vets.size();
+		currentFaceNum = facs.size();
+		targetFaceNum = INT_MAX;
 
 		//loop faces to set edges and faces
 		for (int i = 0; i < faces.size(); i++){
@@ -441,15 +540,6 @@ public:
 				halfedges.push_back(thisHalfEdge);
 				vertices[faces[i]->indice[thisVet]]->halfedge = thisHalfEdge;
 
-				/*pos startPos;
-				startPos.x = thisHalfEdge->start->position.x;
-				startPos.y = thisHalfEdge->start->position.y;
-				startPos.z = thisHalfEdge->start->position.z;
-				pos endPos;
-				endPos.x = thisHalfEdge->end->position.x;
-				endPos.y = thisHalfEdge->end->position.y;
-				endPos.z = thisHalfEdge->end->position.z;*/
-				//find pairedge
 				edgeMap[std::make_pair(faces[i]->indice[thisVet], faces[i]->indice[nextVet])] = thisHalfEdge;
 				HalfEdge *pairEdge;
 				if (edgeMap.count(std::make_pair(faces[i]->indice[nextVet], faces[i]->indice[thisVet]))) {
@@ -539,29 +629,31 @@ public:
 
 		collect_pairs();
 
-
-		while (times > 0 && pairsHeap.size() > 0 && validVert > 4){
+		while (times > 0 && pairsHeap.size() > 0 && currentFaceNum > 4 && currentFaceNum > targetFaceNum){
 			pairInfo currentPair;
 			std::pop_heap(pairsHeap.begin(), pairsHeap.end());
 			currentPair = pairsHeap.back();
 			pairsHeap.pop_back();
-			//std::cout << currentPair.getCost() << std::endl;
-
 			if (contractPair(currentPair)){
-				validVert--;
+				currentFaceNum = currentFaceNum - 2;
 				times--;
 			}
 		}
-
 		resetMeshData();
+	}
 
-		//std::cout << "finish" << std::endl;
+	void quadricSimplifyTo(int targetFace){
+		targetFaceNum = targetFace;
 
+		while (currentFaceNum > targetFaceNum){
+			quadricSimplify(5000);
+			targetFaceNum = targetFace;
+		}
 	}
 
 	void collect_quadrics(){
 		pairsHeap.empty();
-		std::make_heap(pairsHeap.begin(), pairsHeap.end());
+		//std::make_heap(pairsHeap.begin(), pairsHeap.end());
 
 		verticesQuadrics.clear();
 		for (int i = 0; i < vertices.size(); i++){
@@ -588,16 +680,48 @@ public:
 				std::push_heap(pairsHeap.begin(), pairsHeap.end());
 			}
 		}
+		std::make_heap(pairsHeap.begin(), pairsHeap.end());
 	}
 
 	glm::vec4 calcPlane(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3){
 		glm::vec3 normal = glm::cross(v2 - v1, v3 - v1);
-		glm::normalize(normal);
+		normal = glm::normalize(normal);
 		return glm::vec4(normal, -glm::dot(normal, v1));
 	}
 
 	int vertexSize(){
 		return vertices.size();
+	}
+
+	int faceSize(){
+		return faces.size();
+	}
+
+	void printIndegree(){
+		for (int i = 0; i < vertices.size(); i++){
+			if (vertices[i] != NULL ){
+				std::cout << "vet " << i << "has indegree" << vertices[i]->indegree << std::endl;
+			}
+		}
+	}
+
+	void saveMesh(){
+		std::ofstream file("save.obj");
+
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			file << "v " << vertices[i]->position.x << " " << vertices[i]->position.y << " " << vertices[i]->position.z << std::endl;
+
+		}
+		// Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+		for (int i = 0; i < faces.size(); i++)
+		{
+			file << "f";
+			for (int j = 0; j < faces[i]->indice.size(); j++)
+				file << " " << faces[i]->indice[j] + 1;
+			file << std::endl;
+		}
+		file.close();
 	}
 
 };
@@ -622,9 +746,10 @@ public:
 		if (percentToPreserve < 0)
 			percentToPreserve = 0.01;
 		for (int i = 0; i < this->meshes.size(); i++){
-			int totalVert = this->meshes[i].vertexSize();
-			this->meshes[i].quadricSimplify(totalVert*(1 - percentToPreserve));
+			int totalFace = this->meshes[i].faceSize();
+			this->meshes[i].quadricSimplifyTo(totalFace*percentToPreserve);
 		}
+
 	}
 
 	void Draw(Shader shader)
@@ -732,7 +857,6 @@ public:
 			meshface->index = i;
 			faces.push_back(meshface);
 		}
-		//saveModel(mesh);
 		// Return a mesh object created from the extracted mesh data
 		return HalfEdgeMesh(vertices, faces);
 	}
