@@ -21,7 +21,7 @@
 #include "Sky.h"
 #include "Water.h"
 
-GLuint screenWidth = 800, screenHeight = 600;
+GLuint screenWidth = 1440, screenHeight = 960;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));

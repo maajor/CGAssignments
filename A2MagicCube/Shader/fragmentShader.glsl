@@ -54,7 +54,7 @@ void main()
 {
 	vec3 ViewDir = normalize(vec3(ViewPos - WorldPos));
 	vec3 norm = normalize(Normal);
-	vec3 result = AmbientColor;
+	vec3 result = AmbientColor * VertexColor;
 	result += CalcDirColor(dirlight, norm, ViewDir);
 	/*
 	for (int i = 0; i < NR_POINT_LIGHTS; i++){

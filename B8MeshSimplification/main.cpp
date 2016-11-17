@@ -36,6 +36,10 @@ int lastModelRotateDirection = 0;
 float lastModelRotationAngle = 0;
 int lastModelRotationRow = 0;
 
+std::string models[2] = { "eight.uniform.obj", "bunny.obj" };
+int currentModel = 0;
+HalfEdgeModel mymodel;
+
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
@@ -44,6 +48,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mode);
 void do_actions();
+
+void nextModel();
+void simp(double percentage);
 
 int main(){
 
@@ -71,21 +78,9 @@ int main(){
 	// Setup some OpenGL options
 	glEnable(GL_DEPTH_TEST);
 
-	//HalfEdgeModel mymodel("eight.uniform.obj");
-	HalfEdgeModel mymodel("bunny.obj");
-	//HalfEdgeModel mymodel("bunny_big.obj");
-	//HalfEdgeModel mymodel("cube_test.obj");
+	mymodel = HalfEdgeModel(models[currentModel]);
 	Shader shader("vertexShader.glsl", "fragmentShader.glsl");
 
-	//HalfEdgeModel mymodel;
-	std::cout << "before face number " << mymodel.meshes[0].faceSize() << std::endl;
-	time_t start = clock();
-	mymodel.quadricSimplify(0.04);
-	time_t end = clock();
-	std::cout << "time spend " << (double)(end - start) / CLOCKS_PER_SEC << " s "<< std::endl;
-	std::cout << "current face number " << mymodel.meshes[0].faceSize() << std::endl;
-
-	
 	while (!glfwWindowShouldClose(window))
 	{
 		GLfloat currentFrame = glfwGetTime();
@@ -141,6 +136,41 @@ void do_actions(){
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (keys[GLFW_KEY_0]){
+		simp(1);
+	}
+	if (keys[GLFW_KEY_1]){
+		simp(0.1);
+	}
+	if (keys[GLFW_KEY_2]){
+		simp(0.2);
+	}
+	if (keys[GLFW_KEY_3]){
+		simp(0.3);
+	}
+	if (keys[GLFW_KEY_4]){
+		simp(0.4);
+	}
+	if (keys[GLFW_KEY_5]){
+		simp(0.5);
+	}
+	if (keys[GLFW_KEY_6]){
+		simp(0.6);
+	}
+	if (keys[GLFW_KEY_7]){
+		simp(0.7);
+	}
+	if (keys[GLFW_KEY_8]){
+		simp(0.8);
+	}
+	if (keys[GLFW_KEY_9]){
+		simp(0.9);
+	}
+	if (keys[GLFW_KEY_N]){
+		nextModel();
+		std::cout << "changing to model " << models[currentModel] << std::endl << std::endl;
+		mymodel = HalfEdgeModel(models[currentModel]);
+	}
 
 	if (inViewRotate){
 		float xoffset = -cursorPosX + prevPosX;
@@ -192,4 +222,24 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
+}
+
+void nextModel(){
+	currentModel++;
+	currentModel = currentModel % 2;
+}
+
+void simp(double percentage){
+	mymodel = HalfEdgeModel(models[currentModel]);
+
+	int originalFace = mymodel.meshes[0].faceSize();
+	std::cout << "simplifing " << models[currentModel] << " to " << percentage * 100 << "% of original faces" << std::endl;
+	time_t start = clock();
+	mymodel.quadricSimplify(percentage);
+	time_t end = clock();
+	std::cout << "complete!" << std::endl;
+	std::cout << "               original face number: " << originalFace << std::endl;
+	std::cout << "   face number after simplification: " << mymodel.meshes[0].faceSize() << std::endl;
+	std::cout << "                         time spend: " << (double)(end - start) / CLOCKS_PER_SEC << " s " << std::endl <<std::endl;
+
 }

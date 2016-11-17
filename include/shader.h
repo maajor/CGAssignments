@@ -139,7 +139,7 @@ public:
 	}
 
 	void SetDefaultLight(){
-		glUniform3f(glGetUniformLocation(this->Program, "AmbientColor"), 0.1f, 0.1f, 0.1f);
+		glUniform3f(glGetUniformLocation(this->Program, "AmbientColor"), 0.2f, 0.2f, 0.2f);
 		SetDirLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
 	}
 
