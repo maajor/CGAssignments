@@ -86,6 +86,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\fragmentShader.glsl" />
+    <None Include="Shader\gPassFragment.glsl" />
+    <None Include="Shader\gPassVertex.glsl" />
+    <None Include="Shader\lightPassFragment.glsl" />
+    <None Include="Shader\lightPassVertex.glsl" />
     <None Include="Shader\vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>

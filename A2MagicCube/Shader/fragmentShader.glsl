@@ -54,7 +54,7 @@ void main()
 {
 	vec3 ViewDir = normalize(vec3(ViewPos - WorldPos));
 	vec3 norm = normalize(Normal);
-	vec3 result = AmbientColor * VertexColor;
+	vec3 result = AmbientColor * texture(texture_diffuse1, Texcoord);
 	result += CalcDirColor(dirlight, norm, ViewDir);
 	/*
 	for (int i = 0; i < NR_POINT_LIGHTS; i++){
@@ -69,7 +69,7 @@ void main()
 
 vec3 CalcDirColor(DirLight light, vec3 normal, vec3 viewDir){
 	//vec3 albeido = VertexColor * vec3(texture(material.diffuseMap, Texcoord));
-	vec3 albeido = VertexColor;
+	vec3 albeido = texture(texture_diffuse1, Texcoord).rgb;
 	vec3 diffuse = (0.5f * dot(light.direction, normal) + 0.5f) * light.lightColor * albeido;
 	vec3 halfDir = normalize(viewDir + light.direction);
 	vec3 specular = pow(max(dot(normal, halfDir), 0), 32) * light.lightColor * albeido * vec3(texture(texture_specular1, Texcoord));

@@ -32,6 +32,18 @@
     <None Include="Shader\vertexShader.glsl">
       <Filter>源文件</Filter>
     </None>
+    <None Include="Shader\gPassFragment.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="Shader\gPassVertex.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="Shader\lightPassFragment.glsl">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="Shader\lightPassVertex.glsl">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MagicCube.h">

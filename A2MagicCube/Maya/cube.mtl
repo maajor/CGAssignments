@@ -1,42 +1,11 @@
-newmtl backSG
+newmtl blinn1SG
 illum 4
-Kd 1.00 0.00 0.00
+Kd 0.00 0.00 0.00
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
+map_Kd Cube1_basecolor.png
+map_Ka Cube1_metallic.png
+bump Cube1_normal.png
 Ni 1.00
-Ks 0.50 0.50 0.50
-newmtl downSG
-illum 4
-Kd 1.00 0.71 0.00
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.50 0.50 0.50
-newmtl frontSG
-illum 4
-Kd 0.00 1.00 0.01
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.50 0.50 0.50
-newmtl leftSG
-illum 4
-Kd 0.00 0.96 1.00
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.50 0.50 0.50
-newmtl rightSG
-illum 4
-Kd 0.00 0.10 1.00
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.50 0.50 0.50
-newmtl upSG
-illum 4
-Kd 1.00 0.00 0.86
-Ka 0.00 0.00 0.00
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.50 0.50 0.50
+Ks 0.00 0.00 0.00
+map_Ks Cube1_roughness.png

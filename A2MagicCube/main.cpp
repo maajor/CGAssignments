@@ -43,6 +43,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mode);
 void Do_Movement();
 void mymenu(int value);
+void RenderQuad();
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -96,9 +97,59 @@ int main()
 	// Setup some OpenGL options
 	glEnable(GL_DEPTH_TEST);
 
+	
+	//setup G-buffer
+	GLuint gBuffer;
+	glGenFramebuffers(1, &gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+	GLuint gPosition, gNormalMetal, gAlbedoRough;
+
+	// - Position color buffer
+	glGenTextures(1, &gPosition);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+	// - Normal color buffer
+	glGenTextures(1, &gNormalMetal);
+	glBindTexture(GL_TEXTURE_2D, gNormalMetal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormalMetal, 0);
+
+	// - Color + Specular color buffer
+	glGenTextures(1, &gAlbedoRough);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoRough, 0);
+
+	// - Tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+	GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	glDrawBuffers(3, attachments);
+	GLuint rboDepth;
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	// - Finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Setup and compile our shaders
 	Shader shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
+	Shader gPassShader("shader/gPassVertex.glsl", "shader/gPassFragment.glsl");
+	Shader lightPassShader("shader/lightPassVertex.glsl", "shader/lightPassFragment.glsl");
+
+	gPassShader.Use();
+	glUniform1i(glGetUniformLocation(gPassShader.Program, "gPosition"), 0);
+	glUniform1i(glGetUniformLocation(gPassShader.Program, "gNormal"), 1);
+	glUniform1i(glGetUniformLocation(gPassShader.Program, "gAlbedoSpec"), 2);
 
 	Model ourModel("maya/cube.obj");
 	myCube = MagicCube(3, "maya/cube.obj");
@@ -118,16 +169,36 @@ int main()
 		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.Use();   // <-- Don't forget this one!
+		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		gPassShader.Use();
+		gPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+		myCube.render(gPassShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		shader.SetDefaultLight();
-		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		lightPassShader.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gPosition"), 0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gNormalMetal"), 1);
+		glBindTexture(GL_TEXTURE_2D, gNormalMetal);
+		glActiveTexture(GL_TEXTURE2);
+		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gAlbedoRough"), 2);
+		glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
+		
+		//shader.Use();
+		//shader.SetDefaultLight();
+		//shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 
+		//lightPassShader.SetDefaultLight();
+		lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+		//myCube.render(shader);
 
-		//myCube.rotateX(1, deltaTime);
-		// Draw the loaded model
-		myCube.render(shader);
-
+		RenderQuad();
+		
 		// Swap the buffers
 		glfwSwapBuffers(window);
 	}
@@ -318,6 +389,35 @@ void mymenu(int value){
 
 	}
 
+}
+
+GLuint quadVAO = 0;
+GLuint quadVBO;
+void RenderQuad()
+{
+	if (quadVAO == 0)
+	{
+		GLfloat quadVertices[] = {
+			// Positions        // Texture Coords
+			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// Setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 #pragma endregion

@@ -48,11 +48,32 @@ public:
 	}
 
     // Draws the model, and thus all its meshes
-    void Draw(Shader shader)
-    {
+	void Draw(Shader shader)
+	{
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelTransform));
-        for(GLuint i = 0; i < this->meshes.size(); i++)
-            this->meshes[i].Draw(shader);
+
+		for (GLuint i = 0; i < this->meshes.size(); i++)
+		{
+			/*if (textures_loaded.size() >= 4)
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glUniform1i(glGetUniformLocation(shader.Program, "texture_diffuse1"), 0);
+				glBindTexture(GL_TEXTURE_2D, textures_loaded[0].id);
+
+				glActiveTexture(GL_TEXTURE1);
+				glUniform1i(glGetUniformLocation(shader.Program, "texture_roughness1"), 1);
+				glBindTexture(GL_TEXTURE_2D, textures_loaded[1].id);
+
+				glActiveTexture(GL_TEXTURE2);
+				glUniform1i(glGetUniformLocation(shader.Program, "texture_normal1"), 2);
+				glBindTexture(GL_TEXTURE_2D, textures_loaded[2].id);
+
+				glActiveTexture(GL_TEXTURE3);
+				glUniform1i(glGetUniformLocation(shader.Program, "texture_metallic1"), 3);
+				glBindTexture(GL_TEXTURE_2D, textures_loaded[3].id);
+			}*/
+			this->meshes[i].Draw(shader);
+		}
     }
     
 private:
@@ -118,13 +139,13 @@ private:
 			vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 			// 2. Specular maps
-			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_roughness");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			// 3. Normal maps
 			std::vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 			// 4. Height maps
-			std::vector<Texture> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+			std::vector<Texture> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_metallic");
 			textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 			
 			material->Get(AI_MATKEY_COLOR_DIFFUSE, materialColor);
