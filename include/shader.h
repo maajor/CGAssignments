@@ -117,7 +117,6 @@ public:
 	void SetPointLight(int index, glm::vec3 position, glm::vec3 lightColor, float k0, float k1, float k2){
 		std::stringstream indexStringStream;
 		indexStringStream << index;
-
 		glUniform3f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].position").c_str()), position.x, position.y, position.z);
 		glUniform3f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].lightColor").c_str()), lightColor.r, lightColor.g, lightColor.b);
 		glUniform1f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].k0").c_str()), k0);
@@ -141,6 +140,15 @@ public:
 	void SetDefaultLight(){
 		glUniform3f(glGetUniformLocation(this->Program, "AmbientColor"), 0.2f, 0.2f, 0.2f);
 		SetDirLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+	}
+
+	void SetDefaultPointLights(){
+		for (int i = 0; i < 8; i++){
+			int x = 20 * ((i & 4) >> 2) - 10;
+			int y = 20 * ((i & 2) >> 1) - 10;
+			int z = 20 * (i & 1) - 10;
+			SetPointLight(i, glm::vec3( x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 0.0f, 0.0f, 0.0f);
+		}
 	}
 
 	void SetCameraProperty(int width, int height, float near, float far, Camera camera){

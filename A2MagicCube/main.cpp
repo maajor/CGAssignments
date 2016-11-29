@@ -166,7 +166,7 @@ int main()
 		Do_Movement();
 
 		// Clear the colorbuffer
-		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -193,7 +193,8 @@ int main()
 		//shader.SetDefaultLight();
 		//shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 
-		//lightPassShader.SetDefaultLight();
+		lightPassShader.SetDefaultPointLights();
+		lightPassShader.SetDefaultLight();
 		lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 		//myCube.render(shader);
 
