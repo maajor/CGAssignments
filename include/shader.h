@@ -9,6 +9,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <random>
+#include <time.h>
 
 #include "camera.h"
 
@@ -24,6 +26,9 @@ public:
     // Constructor generates the shader on the fly
     Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath = nullptr)
     {
+		pointLightsCount = 0;
+		srand(time(NULL));
+
         // 1. Retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -124,6 +129,16 @@ public:
 		glUniform1f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].k2").c_str()), k2);
 	}
 
+	void RemovePointLightAt(int index){
+		std::stringstream indexStringStream;
+		indexStringStream << index;
+		glUniform3f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].position").c_str()), 0, 0, 0);
+		glUniform3f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].lightColor").c_str()), 0, 0, 0);
+		glUniform1f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].k0").c_str()), 0);
+		glUniform1f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].k1").c_str()), 0);
+		glUniform1f(glGetUniformLocation(this->Program, std::string("pointLight[" + indexStringStream.str() + "].k2").c_str()), 0);
+	}
+
 	void SetSpotLight(int index, glm::vec3 position, glm::vec3 direction, glm::vec3 ligtColor, float k0, float k1, float k2, float innerCutoffAngle, float outerCutoffAngle){
 		std::stringstream indexStringStream;
 		indexStringStream << index;
@@ -142,13 +157,48 @@ public:
 		SetDirLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
 	}
 
-	void SetDefaultPointLights(){
+	void SetDefaultPointLights(int rank){
+		float size = (float) rank / 2.0f + 0.5f;
 		for (int i = 0; i < 8; i++){
-			int x = 20 * ((i & 4) >> 2) - 10;
-			int y = 20 * ((i & 2) >> 1) - 10;
-			int z = 20 * (i & 1) - 10;
+			int x = size  * 2 * ((i & 4) >> 2) - size;
+			int y = size * 2 * ((i & 2) >> 1) - size;
+			int z = size * 2 * (i & 1) - size;
 			SetPointLight(i, glm::vec3( x, y, z), glm::vec3(1.0f, 1.0f, 1.0f), 0.0f, 0.0f, 0.0f);
+			pointLightsCount++;
 		}
+	}
+
+	void RemovePointLight(){
+		if (pointLightsCount <= 0)
+			return;
+		RemovePointLightAt(pointLightsCount);
+		pointLightsCount--;
+	}
+
+	void AddRandomPointLight(int rank){
+		pointLightsCount++;
+		float size = (float)rank / 2.0f + 0.5f;
+		int side = rand() % 3;
+		float x, y, z;
+		if (side == 0){
+			x = size;
+			y = (rand() % 1000) / 1000 * size;
+			z = (rand() % 1000) / 1000 * size;
+		}
+		else if (side == 1){
+			y = size;
+			x = (rand() % 1000) / 1000 * size;
+			z = (rand() % 1000) / 1000 * size;
+		}
+		else {
+			z = size;
+			x = (rand() % 1000) / 1000 * size;
+			y = (rand() % 1000) / 1000 * size;
+		}
+		glm::vec3 randDir = glm::vec3(((rand() % 2) * 2) - 1, ((rand() % 2) * 2) - 1, ((rand() % 2) * 2) - 1);
+		glm::vec3 randPos = glm::vec3(x * randDir.x, y * randDir.y, z * randDir.z);
+		std::cout << "a point light add at " << randPos.x << ", " << randPos.y << ", " << randPos.z << std::endl;
+		SetPointLight(pointLightsCount, randPos, glm::vec3(1.0f, 1.0f, 1.0f), 0.0f, 0.0f, 0.0f);
 	}
 
 	void SetCameraProperty(int width, int height, float near, float far, Camera camera){
@@ -201,6 +251,8 @@ private:
 			}
 		}
 	}
+
+	int pointLightsCount;
 };
 
 #endif

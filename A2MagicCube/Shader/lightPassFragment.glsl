@@ -40,6 +40,9 @@ void main()
 	vec3 Diffuse = texture(gAlbedoRough, TexCoords).rgb;
 	float Roughness = texture(gAlbedoRough, TexCoords).a;
 
+	//decode normal
+	Normal = (Normal - 0.5) * 2;
+
 	// Then calculate lighting as usual
 	vec3 lighting = Diffuse * 0.1; // hard-coded ambient component
 	vec3 viewDir = normalize(ViewPos - FragPos);
@@ -49,10 +52,11 @@ void main()
 	
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		lighting += CalcPointColor(pointLight[i], FragPos, Normal, viewDir, Metallic, Roughness);
+		lighting += CalcPointColor(pointLight[i], FragPos, Normal, viewDir, Metallic, Roughness) * 0.5;
 	}
 	
 	FragColor = vec4(lighting, 1.0);
+	//FragColor = vec4(Metallic, Metallic, Metallic, 1.0);
 }
 
 float D_GGX(in float roughness, in float NdH)
@@ -65,27 +69,28 @@ float D_GGX(in float roughness, in float NdH)
 
 float G_schlick(in float roughness, in float NdV, in float NdL)
 {
-	float k = roughness * roughness * 0.5;
+	float k = (roughness + 1)* (roughness + 1) * 0.125;
 	float V = NdV * (1.0 - k) + k;
 	float L = NdL * (1.0 - k) + k;
 	return 0.25 / (V * L);
 }
 
-vec3 fresnel_factor(vec3 f0, float product)
+vec3 fresnel_factor(vec3 f0, float HdV)
 {
-	return mix(f0, vec3(1.0), pow(1.01 - product, 5.0));
+	return mix(f0, vec3(1.0), pow(1 - HdV, 5.0));
 }
 
-vec3 cooktorrance_specular(float NdL, float NdV, float NdH, vec3 specular, float roughness)
+vec3 cooktorrance_specular(float NdL, float NdV, float NdH, vec3 specfresnel, float roughness)
 {
 
 	float D = D_GGX(roughness, NdH);
 
 	float G = G_schlick(roughness, NdV, NdL);
 
-	float rim = mix(1.0 - roughness * 0.9, 1.0, NdV);
+	//float rim = mix(1.0 - roughness * 0.9, 1.0, NdV);
 
-	return (1.0 / rim) * specular * G * D;
+	//return (1.0 / rim) * specular * G * D;
+	return  specfresnel * G * D;
 }
 
 vec3 CalcPointColor(PointLight light, vec3 worldPos, vec3 normal, vec3 viewDir, float metallic, float roughness){
@@ -95,22 +100,24 @@ vec3 CalcPointColor(PointLight light, vec3 worldPos, vec3 normal, vec3 viewDir, 
 	vec3 N = normal;
 
 	float A = 20.0 / dot(light.position - worldPos, light.position - worldPos);
+	//float A = 10;
 
 	vec3 base = texture(gAlbedoRough, TexCoords).rgb;
 
 	vec3 specular = mix(vec3(0.04), base, metallic);
 
-	float NdL = max(0.0, dot(N, L));
-	float NdV = max(0.001, dot(N, V));
-	float NdH = max(0.001, dot(N, H));
-	float HdV = max(0.001, dot(H, V));
-	float LdV = max(0.001, dot(L, V));
+	float NdL = max(0.0, dot(normal, L));
+	float NdV = max(0.001, dot(normal, viewDir));
+	float NdH = max(0.001, dot(normal, H));
+	float HdV = max(0.001, dot(H, viewDir));
+	float LdV = max(0.001, dot(L, viewDir));
 
 	vec3 specfresnel = fresnel_factor(specular, HdV);
 	vec3 specref = cooktorrance_specular(NdL, NdV, NdH, specfresnel, roughness);
 
 	specref *= vec3(NdL);
-	vec3 diffref = (vec3(1.0) - specfresnel) * (1.0 / PI) * NdL;
+	//vec3 diffref = (vec3(1.0) - specfresnel) * (1.0 / PI) * NdL;
+	vec3 diffref = (1.0 / PI) * NdL * vec3(1.0);
 
 	vec3 light_color = vec3(1.0) * light.lightColor * A;
 	vec3 reflected_light = specref * light_color;

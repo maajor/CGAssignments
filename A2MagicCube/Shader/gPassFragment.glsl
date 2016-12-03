@@ -29,8 +29,9 @@ void main()
 	unpackedNormal.b = sqrt(1 - unpackedNormal.r * unpackedNormal.r - unpackedNormal.g * unpackedNormal.g);
 	unpackedNormal = normalize(unpackedNormal);
 
-	gNormal.rgb = unpackedNormal.r * tangentDir + unpackedNormal.g * bitangentDir + unpackedNormal.b * normalDir;
-	
+	gNormal.rgb = unpackedNormal.r * bitangentDir + unpackedNormal.g * tangentDir + unpackedNormal.b * normalDir;
+	//encode normal 
+	gNormal.rgb = (gNormal.rgb + 1) / 2;
 	gNormal.a = texture(texture_metallic1, TexCoords).r;
 	// And the diffuse per-fragment color
 	gAlbedoRough.rgb = texture(texture_diffuse1, TexCoords).rgb;

@@ -10,8 +10,8 @@ MagicCube::MagicCube(unsigned _rank, string unitPath)
 		for (int j = 0; j < _rank; j++){
 			for (int k = 0; k < _rank; k++){
 				_CubeModels[i][j][k] = Model(unitPath);
-				_CubeModels[i][j][k].bbx[0] = glm::vec3(-0.5f, 0, -0.5f);
-				_CubeModels[i][j][k].bbx[1] = glm::vec3(0.5f, 1.0f, 0.5f);
+				_CubeModels[i][j][k].bbx[0] = glm::vec3(-0.5f, -0.5f, -0.5f);
+				_CubeModels[i][j][k].bbx[1] = glm::vec3(0.5f, 0.5f, 0.5f);
 				float xpos = (i - this->rank / 2.0f) + 0.5f;
 				float ypos = (j - this->rank / 2.0f) + 0.5f;
 				float zpos = (k - this->rank / 2.0f) + 0.5f;
@@ -135,7 +135,7 @@ void MagicCube::resetCube(unsigned axis, unsigned row, float angle){
 		for (int i = 0; i < this->rank; i++){
 			for (int j = 0; j < this->rank; j++){
 				int in, jn;
-				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				calIndexRotate(i, j, this->rank, in, jn, -angleInDegree);
 				_CubeModels[i][row][j].modelTransform = _CubeModels[i][row][j].modelTranslate * rotate * _CubeModels[in][row][jn].modelRotation;
 				_tempRotMatrix[i][j] = _CubeModels[i][row][j].modelRotation;
 
@@ -144,7 +144,7 @@ void MagicCube::resetCube(unsigned axis, unsigned row, float angle){
 		for (int i = 0; i < this->rank; i++){
 			for (int j = 0; j < this->rank; j++){
 				int in, jn;
-				calIndexRotate(i, j, this->rank, in, jn, angleInDegree);
+				calIndexRotate(i, j, this->rank, in, jn, -angleInDegree);
 				_CubeModels[i][row][j].modelRotation = rotate * _tempRotMatrix[in][jn];
 			}
 		}
@@ -190,6 +190,9 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 				glm::vec3 currentBbx[2];
 				currentBbx[0] = glm::vec3(_CubeModels[i][j][k].modelTranslate * glm::vec4(_CubeModels[i][j][k].bbx[0], 1));
 				currentBbx[1] = glm::vec3(_CubeModels[i][j][k].modelTranslate * glm::vec4(_CubeModels[i][j][k].bbx[1], 1));
+				if (i == 0 && j == 2 && k == 2){
+					int d = 0;
+				}
 				if (hitray.checkHit(hitDist, currentBbx, side))
 				{
 					if (hitDist < minHitDist)

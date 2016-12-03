@@ -193,7 +193,8 @@ int main()
 		//shader.SetDefaultLight();
 		//shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 
-		lightPassShader.SetDefaultPointLights();
+		lightPassShader.SetDefaultPointLights(myCube.rank);
+		//lightPassShader.SetPointLight(0, glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.0f, 0.0f, 0.0f);
 		lightPassShader.SetDefaultLight();
 		lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 		//myCube.render(shader);
