@@ -6,6 +6,7 @@
 
 // Std. Includes
 #include <string>
+#include <stdio.h>
 
 // GLEW
 #define GLEW_STATIC
@@ -44,6 +45,14 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode);
 void Do_Movement();
 void mymenu(int value);
 void RenderQuad();
+void SetDefaultPointLights(int rank);
+void RemovePointLight();
+void AddRandomPointLight(int rank);
+
+void DeferRendering();
+void ForwardRendering();
+void (*renderMethod[2])() = { DeferRendering, ForwardRendering };
+int currentRenderer = 1;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -61,11 +70,29 @@ int lastModelRotateDirection = 0;
 float lastModelRotationAngle = 0;
 int lastModelRotationRow = 0;
 
+std::string  currentModel = "maya/cube1.obj";
+int currentRank = 3;
+std::vector<glm::vec3> pointLights;
+float totalIntensity = 5.0f;
+
+// forward rendering shader
+Shader shader;
+
+// defer rendering shader
+Shader gPassShader;
+Shader lightPassShader;
+
+GLuint gBuffer;
+GLuint gPosition, gNormalMetal, gAlbedoRough;
+
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+GLfloat fpsFrame = 0.0f;
 
 glm::vec3 hitIndex;
 int hitSide;
+
+const int MAX_POINT_LIGHTS = 32;
 
 MagicCube myCube;
 // The MAIN function, from here we start our application and run our Game loop
@@ -99,10 +126,8 @@ int main()
 
 	
 	//setup G-buffer
-	GLuint gBuffer;
 	glGenFramebuffers(1, &gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-	GLuint gPosition, gNormalMetal, gAlbedoRough;
 
 	// - Position color buffer
 	glGenTextures(1, &gPosition);
@@ -141,25 +166,36 @@ int main()
 		std::cout << "Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Setup and compile our shaders
-	Shader shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
-	Shader gPassShader("shader/gPassVertex.glsl", "shader/gPassFragment.glsl");
-	Shader lightPassShader("shader/lightPassVertex.glsl", "shader/lightPassFragment.glsl");
+	// forward rendering shader
+	shader = Shader("shader/vertexShader.glsl", "shader/fragmentShader.glsl");
+
+	// defer rendering shader
+	gPassShader = Shader("shader/gPassVertex.glsl", "shader/gPassFragment.glsl");
+	lightPassShader = Shader("shader/lightPassVertex.glsl", "shader/lightPassFragment.glsl");
 
 	gPassShader.Use();
 	glUniform1i(glGetUniformLocation(gPassShader.Program, "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(gPassShader.Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(gPassShader.Program, "gAlbedoSpec"), 2);
 
-	Model ourModel("maya/cube.obj");
-	myCube = MagicCube(3, "maya/cube.obj");
-	// Game loop
+	//Model ourModel("maya/cube.obj");
+	myCube = MagicCube(3, currentModel);
+	SetDefaultPointLights(3);
+	// loop
 	while (!glfwWindowShouldClose(window))
 	{
 		// Set frame time
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		
+		if ((currentFrame - fpsFrame) > 0.5f){
+			std::stringstream title;
+			title << "AssignmentA2 at " << 1.0f / (float)deltaTime << " FPS";
+			
+			glfwSetWindowTitle(window, title.str().c_str());
+			fpsFrame = currentFrame;
+		}
 
 		// Check and call events
 		glfwPollEvents();
@@ -169,6 +205,9 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		renderMethod[currentRenderer]();
+		
+		/*
 		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		gPassShader.Use();
@@ -189,18 +228,37 @@ int main()
 		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gAlbedoRough"), 2);
 		glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
 		
-		//shader.Use();
-		//shader.SetDefaultLight();
-		//shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 
-		lightPassShader.SetDefaultPointLights(myCube.rank);
-		//lightPassShader.SetPointLight(0, glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.0f, 0.0f, 0.0f);
+
+		float pointLightSize = pointLights.size();
+		for (int i = 0; i < pointLights.size(); i++){
+			lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
+		}
+		//reset rest point lights
+		for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
+			lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
+		}
 		lightPassShader.SetDefaultLight();
 		lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
-		//myCube.render(shader);
 
 		RenderQuad();
-		
+		*/
+
+		/*
+		shader.Use();
+		float pointLightSize = pointLights.size();
+		for (int i = 0; i < pointLights.size(); i++){
+			lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
+		}
+		//reset rest point lights
+		for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
+			lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
+		}
+		shader.SetDefaultLight();
+		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+		myCube.render(shader);
+		*/
+
 		// Swap the buffers
 		glfwSwapBuffers(window);
 	}
@@ -303,16 +361,64 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	else if (action == GLFW_RELEASE)
 		keys[key] = false;
 
-	if (key == GLFW_KEY_F2 && action == GLFW_PRESS)
-		myCube = MagicCube(2, "maya/cube.obj");
-	if (key == GLFW_KEY_F3 && action == GLFW_PRESS)
-		myCube = MagicCube(3, "maya/cube.obj");
-	if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
-		myCube = MagicCube(4, "maya/cube.obj");
-	if (key == GLFW_KEY_F5 && action == GLFW_PRESS)
-		myCube = MagicCube(5, "maya/cube.obj");
-	if (key == GLFW_KEY_F6 && action == GLFW_PRESS)
-		myCube = MagicCube(6, "maya/cube.obj");
+	if (key == GLFW_KEY_F2 && action == GLFW_PRESS){
+		currentRank = 2;
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS){
+		currentRank = 3;
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_F4 && action == GLFW_PRESS){
+		currentRank = 4;
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_F5 && action == GLFW_PRESS){
+		currentRank = 5;
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_F6 && action == GLFW_PRESS){
+		currentRank = 6;
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS){
+		currentModel = "maya/cube1.obj";
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS){
+		currentModel = "maya/cube2.obj";
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS){
+		currentModel = "maya/cube3.obj";
+		myCube = MagicCube(currentRank, currentModel);
+		SetDefaultPointLights(currentRank);
+	}
+
+	if (key == GLFW_KEY_PAGE_UP && action == GLFW_PRESS){
+		AddRandomPointLight(currentRank);
+	}
+	if (key == GLFW_KEY_PAGE_DOWN && action == GLFW_PRESS){
+		RemovePointLight();
+	}
+
+	if (key == GLFW_KEY_E && action == GLFW_PRESS){
+		currentRenderer = 0;
+		std::cout << "changing to defer rendering..." << std::endl;
+	}
+	if (key == GLFW_KEY_R && action == GLFW_PRESS){
+		currentRenderer = 1;
+		std::cout << "changing to forward rendering..." << std::endl;
+	}
+
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -350,19 +456,19 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mode){
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && keys[GLFW_KEY_LEFT_CONTROL] == true){
 		Ray hitray(camera, glm::vec2(cursorPosX, cursorPosY), glm::vec2(screenWidth, screenHeight));
 		if (myCube.findHit(hitray, hitIndex, hitSide)){
-			std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << " "<< hitSide <<std::endl;
+			//std::cout << hitIndex.x << " " << hitIndex.y << " " << hitIndex.z << " "<< hitSide <<std::endl;
 			inModelRotate = true; 
 			lastHitX = cursorPosX;
 			lastHitY = cursorPosY;
 			lastModelRotateDirection = (hitSide + 1) % 3;
-			std::cout << "last model dir: " << lastModelRotateDirection << " " << hitSide << std::endl;
+			//std::cout << "last model dir: " << lastModelRotateDirection << " " << hitSide << std::endl;
 			//lastModelRotateDirection = hitSide;
 		}
 	}
 	else{
 		if (keys[GLFW_KEY_LEFT_CONTROL] == true){
 			myCube.resetCube(lastModelRotateDirection, lastModelRotationRow, lastModelRotationAngle);
-			std::cout << "finish Rotate" << lastModelRotateDirection << " axis" <<std::endl;
+			std::cout << "finish Rotate " << lastModelRotateDirection << " axis" <<std::endl;
 		}
 		else
 			myCube.resetTransform();
@@ -420,6 +526,107 @@ void RenderQuad()
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
+}
+
+void SetDefaultPointLights(int rank){
+	pointLights.clear();
+	float size = (float)rank / 2.0f + 0.5f;
+	for (int i = 0; i < 8; i++){
+		int x = size * 2 * ((i & 4) >> 2) - size;
+		int y = size * 2 * ((i & 2) >> 1) - size;
+		int z = size * 2 * (i & 1) - size;
+		pointLights.push_back(glm::vec3(x, y, z));
+	}
+}
+
+void RemovePointLight(){
+	if (pointLights.size() <= 0)
+		return;
+	pointLights.pop_back();
+	std::cout << "remove a point light" << std::endl;
+	std::cout << "current point light count: " << pointLights.size() << std::endl << std::endl;
+}
+
+void AddRandomPointLight(int rank){
+	if (pointLights.size() >= MAX_POINT_LIGHTS){
+		return;
+	}
+	float size = (float)rank / 2.0f + 0.5f;
+	int side = rand() % 3;
+	float x, y, z;
+	if (side == 0){
+		x = size;
+		y = (rand() % 1000) / 1000.0f * size;
+		z = (rand() % 1000) / 1000.0f * size;
+	}
+	else if (side == 1){
+		y = size;
+		x = (rand() % 1000) / 1000.0f * size;
+		z = (rand() % 1000) / 1000.0f * size;
+	}
+	else {
+		z = size;
+		x = (rand() % 1000) / 1000.0f * size;
+		y = (rand() % 1000) / 1000.0f * size;
+	}
+	glm::vec3 randDir = glm::vec3(((rand() % 2) * 2) - 1, ((rand() % 2) * 2) - 1, ((rand() % 2) * 2) - 1);
+	glm::vec3 randPos = glm::vec3(x * randDir.x, y * randDir.y, z * randDir.z);
+	std::cout << "a point light add at " << randPos.x << ", " << randPos.y << ", " << randPos.z << std::endl;
+	std::cout << "current point light count: " << pointLights.size() << std::endl << std::endl;
+	pointLights.push_back(randPos);
+}
+
+void DeferRendering(){
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gPassShader.Use();
+	gPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+	myCube.render(gPassShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	lightPassShader.Use();
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(lightPassShader.Program, "gPosition"), 0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(lightPassShader.Program, "gNormalMetal"), 1);
+	glBindTexture(GL_TEXTURE_2D, gNormalMetal);
+	glActiveTexture(GL_TEXTURE2);
+	glUniform1i(glGetUniformLocation(lightPassShader.Program, "gAlbedoRough"), 2);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
+
+
+
+	float pointLightSize = pointLights.size();
+	for (int i = 0; i < pointLights.size(); i++){
+		lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
+	}
+	//reset rest point lights
+	for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
+		lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
+	}
+	lightPassShader.SetDefaultLight();
+	lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+
+	RenderQuad();
+}
+
+
+void ForwardRendering(){
+	shader.Use();
+	float pointLightSize = pointLights.size();
+	for (int i = 0; i < pointLights.size(); i++){
+		lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
+	}
+	//reset rest point lights
+	for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
+		lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
+	}
+	shader.SetDefaultLight();
+	shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
+	myCube.render(shader);
 }
 
 #pragma endregion

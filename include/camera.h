@@ -147,8 +147,8 @@ public:
 		//std::cout << this->Front.x << " " << this->Front.y << " " << this->Front.z << " " << std::endl;
 	}
 	void ProcessMousePan(GLfloat xoffset, GLfloat yoffset){
-		xoffset *= 0.001f;
-		yoffset *= 0.001f;
+		xoffset *= 0.005f;
+		yoffset *= 0.005f;
 
 		glm::vec3 currentUp = glm::normalize(glm::cross(this->Right, this->Front));
 

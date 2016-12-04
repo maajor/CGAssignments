@@ -9,7 +9,7 @@ layout(location = 5) in vec3 color;
 out vec3 WorldPos;
 out vec3 Normal;
 out vec2 Texcoord;
-out vec3 VertexColor;
+out vec3 Tangent;
 
 
 uniform mat4 model;
@@ -22,5 +22,5 @@ void main()
 	WorldPos = vec3(model * vec4(position, 1.0f));
 	Normal = mat3(transpose(inverse(model))) * normal;
 	Texcoord = texcoord;
-	VertexColor = color;
+	Tangent = tangent;
 }

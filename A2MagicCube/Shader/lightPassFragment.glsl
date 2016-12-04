@@ -12,8 +12,8 @@ struct PointLight {
 	vec3 position;
 	vec3 lightColor;
 
-	float Linear;
-	float Quadratic;
+	//float Linear;
+	//float Quadratic;
 };
 
 struct DirLight{
@@ -52,7 +52,7 @@ void main()
 	
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		lighting += CalcPointColor(pointLight[i], FragPos, Normal, viewDir, Metallic, Roughness) * 0.5;
+		lighting += CalcPointColor(pointLight[i], FragPos, Normal, viewDir, Metallic, Roughness);
 	}
 	
 	FragColor = vec4(lighting, 1.0);

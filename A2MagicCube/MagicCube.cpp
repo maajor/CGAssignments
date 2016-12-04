@@ -3,6 +3,8 @@
 
 MagicCube::MagicCube(unsigned _rank, string unitPath)
 {
+	std::cout << "loading... " << unitPath << " at rank " << _rank << std::endl;
+
 	this->rank = _rank;
 	this->_CubeModels = std::vector<std::vector<std::vector<Model>>>(_rank, std::vector<std::vector<Model> >(_rank, std::vector<Model>(_rank, Model(unitPath))));
 	this->_tempRotMatrix = std::vector<std::vector<glm::mat4>>(_rank, std::vector<glm::mat4>(_rank, glm::mat4()));
@@ -197,12 +199,12 @@ bool MagicCube::findHit(Ray hitray, glm::vec3 &hitIndex, int &side){
 				{
 					if (hitDist < minHitDist)
 					{
-						std::cout << "this hit dist" << hitDist << " " << i << " " << j << " " << k << std::endl;
+						//std::cout << "this hit dist" << hitDist << " " << i << " " << j << " " << k << std::endl;
 						minHitDist = hitDist;
 						hitIndexTemp = glm::vec3(i, j, k);
 					}
 				}
-				std::cout << "side now is " << side << std::endl;
+				//std::cout << "side now is " << side << std::endl;
 			}
 		}
 	}
