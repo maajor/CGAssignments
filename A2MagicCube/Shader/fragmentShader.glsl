@@ -68,7 +68,6 @@ void main()
 	{
 		lighting += CalcPointColor(pointLight[i], WorldPos, norm, ViewDir, Metallic, Roughness);
 	}
-
 	color = vec4(lighting, 1.0);
 
 }

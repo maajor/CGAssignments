@@ -55,7 +55,7 @@ void (*renderMethod[2])() = { DeferRendering, ForwardRendering };
 int currentRenderer = 1;
 
 // Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera(glm::vec3(3.0f, 3.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 //Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
@@ -230,7 +230,7 @@ int main()
 		
 
 
-		float pointLightSize = pointLights.size();
+		float size = pointLights.size();
 		for (int i = 0; i < pointLights.size(); i++){
 			lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
 		}
@@ -598,7 +598,6 @@ void DeferRendering(){
 	glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
 
 
-
 	float pointLightSize = pointLights.size();
 	for (int i = 0; i < pointLights.size(); i++){
 		lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
@@ -617,13 +616,15 @@ void DeferRendering(){
 void ForwardRendering(){
 	shader.Use();
 	float pointLightSize = pointLights.size();
-	for (int i = 0; i < pointLights.size(); i++){
-		lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
+	
+	for (int i = 0; i < pointLightSize; i++){
+		shader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
 	}
 	//reset rest point lights
 	for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
-		lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
+		shader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
 	}
+	
 	shader.SetDefaultLight();
 	shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
 	myCube.render(shader);
