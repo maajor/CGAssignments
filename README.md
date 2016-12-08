@@ -23,13 +23,13 @@ B8 网格简化
 
 ![](B8MeshSimplification/b8.jpg)  
 
-A2 魔方(WIP)  
+A2 魔方  
 
-![](A2MagicCube/A2.jpg) 
+![](A2MagicCube/A2Preview.gif) 
 
-A6 地形显示(WIP)  
+A6 地形显示  
 
-![](A6TerrainEngine/A6.jpg) 
+![](A6TerrainEngine/A6Preview.gif) 
 
 
-Ma Yidong, 2016.11  
+Ma Yidong, 2016.12  

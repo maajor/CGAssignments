@@ -31,8 +31,9 @@ CubeMap使用了OpenGL自带的CubeMap功能，渲染时把View Maxtrix的Transf
 
 FlowMap是一种制作带流动方向的水面的方式，最早出现在V社的Portal2，发表在SIGGRAPH2010。有关这个技术的具体实现我写在这篇博客[OpenGL中Flowmap水面](http://ma-yidong.com/2016/11/04/flowmap%E6%B0%B4%E9%9D%A2/)中。  
 不过Shader为了省事使用法线贴图计算法线并没有转到法线空间（因为水面本来是平的。。。）
+FlowMap自己在Photoshop中绘制，达到水面遇到地形分叉，以及沿河流方向流动的效果。
 
-制作倒影时，先用两个Pass把地形水下的部分，倒影部分(镜像相机位置)分别渲在两个FrameBufferTexture中，然后把Texture传给水面的Shader，Shader中根据水面法线方向扰动两个Texture实现倒影的波动。  
+使用RenderToTexture技术制作倒影时，先用两个Pass把地形水下的部分，倒影部分(镜像相机位置)分别渲在两个FrameBufferTexture中，然后把Texture传给水面的Shader，Shader中根据水面法线方向扰动两个Texture实现倒影的波动。  
 
 交互操作：  
 `W`: 前进  
@@ -48,5 +49,9 @@ FlowMap是一种制作带流动方向的水面的方式，最早出现在V社的
 
 ### 实验效果
 
-![实现效果](A6.jpg)  
+![几个Pass](A6Passes.jpg)  
+几个Pass  
+
+![实现效果](A6Preview.gif)  
+实现效果  
 

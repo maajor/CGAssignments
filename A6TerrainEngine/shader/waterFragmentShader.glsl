@@ -71,6 +71,7 @@ void main()
 	//color = vec4(skyCol.xyz * reflColor.xyz * refrColor.xyz + specular, 0.6f);
 
 	//color = fresnel*reflColor + refraction + vec4(skyCol.xyz + specular * refraction.xyz, 0.6f);
+	
 	color = vec4((skyCol.xyz + specular) * reflColor.xyz + refraction.xyz, 0.6f);
 	//color = vec4(1.0f);
 }

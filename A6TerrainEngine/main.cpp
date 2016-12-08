@@ -24,7 +24,7 @@
 GLuint screenWidth = 1440, screenHeight = 960;
 
 // Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 //Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 bool keys[1024];
 

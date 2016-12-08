@@ -52,7 +52,7 @@ void AddRandomPointLight(int rank);
 void DeferRendering();
 void ForwardRendering();
 void (*renderMethod[2])() = { DeferRendering, ForwardRendering };
-int currentRenderer = 1;
+int currentRenderer = 0;
 
 // Camera
 Camera camera(glm::vec3(3.0f, 3.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -207,58 +207,6 @@ int main()
 
 		renderMethod[currentRenderer]();
 		
-		/*
-		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		gPassShader.Use();
-		gPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
-		myCube.render(gPassShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		lightPassShader.Use();
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gPosition"), 0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glActiveTexture(GL_TEXTURE1);
-		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gNormalMetal"), 1);
-		glBindTexture(GL_TEXTURE_2D, gNormalMetal);
-		glActiveTexture(GL_TEXTURE2);
-		glUniform1i(glGetUniformLocation(lightPassShader.Program, "gAlbedoRough"), 2);
-		glBindTexture(GL_TEXTURE_2D, gAlbedoRough);
-		
-
-
-		float size = pointLights.size();
-		for (int i = 0; i < pointLights.size(); i++){
-			lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
-		}
-		//reset rest point lights
-		for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
-			lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
-		}
-		lightPassShader.SetDefaultLight();
-		lightPassShader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
-
-		RenderQuad();
-		*/
-
-		/*
-		shader.Use();
-		float pointLightSize = pointLights.size();
-		for (int i = 0; i < pointLights.size(); i++){
-			lightPassShader.SetPointLight(i, pointLights[i], glm::vec3(totalIntensity / pointLightSize, totalIntensity / pointLightSize, totalIntensity / pointLightSize), 0.0f, 0.0f, 0.0f);
-		}
-		//reset rest point lights
-		for (int i = pointLightSize; i < MAX_POINT_LIGHTS; i++){
-			lightPassShader.SetPointLight(i, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.0f, 0.0f, 0.0f);
-		}
-		shader.SetDefaultLight();
-		shader.SetCameraProperty(screenWidth, screenHeight, 0.1f, 100.0f, camera);
-		myCube.render(shader);
-		*/
-
 		// Swap the buffers
 		glfwSwapBuffers(window);
 	}

@@ -56,7 +56,7 @@ void main()
 	}
 	
 	FragColor = vec4(lighting, 1.0);
-	//FragColor = vec4(Metallic, Metallic, Metallic, 1.0);
+	//FragColor = vec4(Roughness, Roughness, Roughness, 1.0);
 }
 
 float D_GGX(in float roughness, in float NdH)
